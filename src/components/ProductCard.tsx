@@ -44,10 +44,10 @@ export default function ProductCard({ product }: Props) {
           {(() => {
             const [english, tamil] = product.name.split(' / ');
             return (
-              <>
-                <h3 className="font-medium text-sm mb-0.5 hover:text-[#1B4332] transition-colors">{english}</h3>
-                {tamil && <p className="text-xs text-gray-400 mb-1">{tamil}</p>}
-              </>
+              <h3 className="font-medium text-sm mb-1 hover:text-[#1B4332] transition-colors leading-snug">
+                {english}
+                {tamil && <span className="font-normal text-gray-400 ml-1">/ {tamil}</span>}
+              </h3>
             );
           })()}
         </Link>
