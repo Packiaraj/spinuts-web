@@ -1,101 +1,212 @@
-import Image from "next/image";
+'use client';
+import Link from 'next/link';
+import { useState, useEffect } from 'react';
+import ProductCard from '@/components/ProductCard';
+import { Product, Category } from '@/lib/types';
 
-export default function Home() {
+const CATEGORIES: { id: Category; label: string }[] = [
+  { id: 'all', label: 'All' },
+  { id: 'spices', label: 'Spices' },
+  { id: 'nuts', label: 'Nuts' },
+  { id: 'seeds', label: 'Seeds' },
+  { id: 'millets', label: 'Millets' },
+  { id: 'dry-fruits', label: 'Dry Fruits' },
+];
+
+const TRUST_SIGNALS = [
+  { icon: '🌿', label: 'Farm Direct', sub: 'No middlemen' },
+  { icon: '🏔️', label: 'Kerala Origin', sub: 'Certified source' },
+  { icon: '✦', label: 'Whole Spices', sub: 'Unprocessed, pure' },
+  { icon: '📦', label: 'Pan India', sub: 'Fast delivery' },
+];
+
+const SAMPLE_PRODUCTS: Product[] = [
+  {
+    id: '1', name: 'Black Pepper Whole', description: 'Bold, pungent whole black pepper from the hills of Wayanad, Kerala.',
+    price_inr: 320, price_usd: 4, original_price_inr: 420, original_price_usd: 5,
+    category: 'spices', weight: '100g', stock: 50, images: [], origin: 'Wayanad, Kerala', active: true, created_at: '',
+  },
+  {
+    id: '2', name: 'Cardamom Green', description: 'Intensely aromatic green cardamom pods hand-picked from Idukki.',
+    price_inr: 580, price_usd: 7, original_price_inr: 750, original_price_usd: 9,
+    category: 'spices', weight: '50g', stock: 30, images: [], origin: 'Idukki, Kerala', active: true, created_at: '',
+  },
+  {
+    id: '3', name: 'Cashews W240', description: 'Whole cashews, premium W240 grade, sourced from Kollam.',
+    price_inr: 850, price_usd: 10, original_price_inr: 1050, original_price_usd: 13,
+    category: 'nuts', weight: '250g', stock: 40, images: [], origin: 'Kollam, Kerala', active: true, created_at: '',
+  },
+  {
+    id: '4', name: 'Cloves Whole', description: 'Fragrant whole cloves with high eugenol content from Thrissur.',
+    price_inr: 240, price_usd: 3, original_price_inr: 300, original_price_usd: 4,
+    category: 'spices', weight: '50g', stock: 60, images: [], origin: 'Thrissur, Kerala', active: true, created_at: '',
+  },
+  {
+    id: '5', name: 'Ragi / Finger Millet', description: 'Nutrient-dense finger millet from traditional farms in Tamil Nadu.',
+    price_inr: 180, price_usd: 2, category: 'millets', weight: '500g',
+    stock: 80, images: [], origin: 'Salem, Tamil Nadu', active: true, created_at: '',
+  },
+  {
+    id: '6', name: 'Almonds Raw', description: 'Raw, unsalted whole almonds — rich in healthy fats and protein.',
+    price_inr: 720, price_usd: 9, original_price_inr: 900, original_price_usd: 11,
+    category: 'nuts', weight: '250g', stock: 35, images: [], origin: 'Imported, Packed in India', active: true, created_at: '',
+  },
+  {
+    id: '7', name: 'Cumin Seeds', description: 'Earthy, warm cumin seeds from the spice heartland of Rajasthan.',
+    price_inr: 150, price_usd: 2, category: 'seeds', weight: '100g',
+    stock: 90, images: [], origin: 'Rajasthan', active: true, created_at: '',
+  },
+  {
+    id: '8', name: 'Dates Medjool', description: 'Soft, caramel-sweet Medjool dates, premium grade.',
+    price_inr: 650, price_usd: 8, original_price_inr: 800, original_price_usd: 10,
+    category: 'dry-fruits', weight: '250g', stock: 25, images: [], origin: 'Imported, Packed in India', active: true, created_at: '',
+  },
+];
+
+export default function HomePage() {
+  const [activeCategory, setActiveCategory] = useState<Category>('all');
+  const [products, setProducts] = useState<Product[]>(SAMPLE_PRODUCTS);
+
+  useEffect(() => {
+    async function fetchProducts() {
+      try {
+        const { supabase } = await import('@/lib/supabase');
+        const { data } = await supabase.from('products').select('*').eq('active', true);
+        if (data && data.length > 0) setProducts(data);
+      } catch {
+        // fall back to sample data
+      }
+    }
+    fetchProducts();
+  }, []);
+
+  const filtered = activeCategory === 'all'
+    ? products
+    : products.filter((p) => p.category === activeCategory);
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div>
+      {/* Hero */}
+      <section style={{ backgroundColor: '#1B4332', color: '#FFF8F0' }} className="py-28 px-6">
+        <div className="max-w-7xl mx-auto">
+          <p className="label-tag mb-6" style={{ color: '#D4A017' }}>Kerala · Tamil Nadu · South India</p>
+          <h1 className="text-4xl md:text-6xl font-medium mb-6 leading-tight" style={{ maxWidth: 700, fontWeight: 500 }}>
+            Pure spices.<br />Real origin.<br />No middlemen.
+          </h1>
+          <p className="text-base mb-10" style={{ color: 'rgba(255,248,240,0.75)', maxWidth: 440, lineHeight: 1.7 }}>
+            Family-sourced whole spices and nuts directly from Kerala and Tamil Nadu farms.
+            Unprocessed, unadulterated, and delivered to your door.
+          </p>
+          <Link
+            href="/products"
+            className="inline-block px-8 py-4 font-medium transition-opacity hover:opacity-90"
+            style={{ backgroundColor: '#D4A017', color: '#1B4332', letterSpacing: '0.08em', fontSize: '0.8rem', textTransform: 'uppercase' }}
           >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            Shop All Products
+          </Link>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </section>
+
+      {/* Trust bar */}
+      <section className="py-8 px-6" style={{ borderBottom: '0.5px solid rgba(0,0,0,0.08)', backgroundColor: 'white' }}>
+        <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6">
+          {TRUST_SIGNALS.map((s) => (
+            <div key={s.label} className="flex items-center gap-3">
+              <span className="text-xl">{s.icon}</span>
+              <div>
+                <p className="label-tag" style={{ color: '#1B4332' }}>{s.label}</p>
+                <p className="text-xs text-gray-500 mt-0.5">{s.sub}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Products */}
+      <section className="py-16 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-xl font-medium" style={{ fontWeight: 500 }}>Our Products</h2>
+            <Link href="/products" className="label-tag" style={{ color: '#1B4332' }}>View All →</Link>
+          </div>
+
+          {/* Category pills */}
+          <div className="flex gap-2 mb-10 flex-wrap">
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setActiveCategory(cat.id)}
+                className="label-tag px-4 py-2 transition-colors"
+                style={
+                  activeCategory === cat.id
+                    ? { backgroundColor: '#1B4332', color: '#FFF8F0', border: '0.5px solid #1B4332' }
+                    : { backgroundColor: 'transparent', color: '#555', border: '0.5px solid rgba(0,0,0,0.15)' }
+                }
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {filtered.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Story teaser */}
+      <section style={{ backgroundColor: '#1B4332', color: '#FFF8F0' }} className="py-20 px-6">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center">
+          <div>
+            <p className="label-tag mb-4" style={{ color: '#D4A017' }}>Our Story</p>
+            <h2 className="text-3xl font-medium mb-6 leading-snug" style={{ fontWeight: 500 }}>
+              From our family&apos;s farms<br />to your kitchen.
+            </h2>
+            <p className="text-sm mb-4" style={{ color: 'rgba(255,248,240,0.75)', lineHeight: 1.8 }}>
+              SpiNuts began with a simple belief: the best spices are whole spices, freshly sourced.
+              Our family has been working directly with farmers in Kerala and Tamil Nadu for generations,
+              cutting out every layer of middlemen so you get the real thing.
+            </p>
+            <p className="text-sm mb-8" style={{ color: 'rgba(255,248,240,0.75)', lineHeight: 1.8 }}>
+              Every batch is traceable to its farm. Every product is packed within days of harvest.
+              That&apos;s the SpiNuts promise.
+            </p>
+            <Link href="/story" className="label-tag" style={{ color: '#D4A017', borderBottom: '0.5px solid #D4A017', paddingBottom: 2 }}>
+              Read Our Story →
+            </Link>
+          </div>
+          <div className="aspect-square flex items-center justify-center"
+            style={{ backgroundColor: '#0F2D22', border: '0.5px solid rgba(255,248,240,0.1)' }}>
+            <div className="text-center">
+              <p className="text-6xl mb-4">🌿</p>
+              <p className="label-tag" style={{ color: 'rgba(255,248,240,0.4)' }}>Kerala Farms</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Gift CTA */}
+      <section className="py-16 px-6 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="p-10 flex flex-col md:flex-row items-center justify-between gap-6"
+            style={{ border: '0.5px solid #D4A017' }}>
+            <div>
+              <span className="label-tag px-3 py-1 mb-4 inline-block" style={{ backgroundColor: '#D4A017', color: '#1B4332' }}>
+                Diwali Special
+              </span>
+              <h3 className="text-2xl font-medium" style={{ fontWeight: 500 }}>Gift boxes available</h3>
+              <p className="text-sm text-gray-600 mt-2">Curated spice and nut collections, beautifully packed.</p>
+            </div>
+            <Link href="/products"
+              className="label-tag px-8 py-4 whitespace-nowrap transition-opacity hover:opacity-90"
+              style={{ backgroundColor: '#1B4332', color: '#FFF8F0' }}>
+              Shop Gift Boxes
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
