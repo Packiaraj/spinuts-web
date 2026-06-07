@@ -41,7 +41,15 @@ export default function ProductCard({ product }: Props) {
       <div className="p-4">
         <p className="label-tag mb-1" style={{ color: '#1B4332' }}>{product.category}</p>
         <Link href={`/products/${product.id}`}>
-          <h3 className="font-medium text-sm mb-1 hover:text-[#1B4332] transition-colors">{product.name}</h3>
+          {(() => {
+            const [english, tamil] = product.name.split(' / ');
+            return (
+              <>
+                <h3 className="font-medium text-sm mb-0.5 hover:text-[#1B4332] transition-colors">{english}</h3>
+                {tamil && <p className="text-xs text-gray-400 mb-1">{tamil}</p>}
+              </>
+            );
+          })()}
         </Link>
         <p className="text-xs text-gray-500 mb-3">{product.weight}</p>
 
