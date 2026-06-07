@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
+import { createBrowserClient } from '@supabase/ssr';
 
 function LoginForm() {
   const router = useRouter();
@@ -18,15 +19,18 @@ function LoginForm() {
     setLoading(true);
     setError('');
     try {
-      const { supabase } = await import('@/lib/supabase');
+      const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
       router.push(redirect);
       router.refresh();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Invalid email or password');
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   return (
