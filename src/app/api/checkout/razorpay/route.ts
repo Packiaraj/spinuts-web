@@ -1,21 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
-  if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+  const keyId = process.env.RAZORPAY_KEY_ID;
+  const keySecret = process.env.RAZORPAY_KEY_SECRET;
+
+  if (!keyId || !keySecret) {
     return NextResponse.json({ error: 'Razorpay not configured' }, { status: 503 });
   }
+
   try {
-    const Razorpay = (await import('razorpay')).default;
-    const razorpay = new Razorpay({
-      key_id: process.env.RAZORPAY_KEY_ID,
-      key_secret: process.env.RAZORPAY_KEY_SECRET,
-    });
     const { amount } = await req.json();
-    const order = await razorpay.orders.create({
-      amount: Math.round(amount * 100),
-      currency: 'INR',
-      receipt: `receipt_${Date.now()}`,
+    const credentials = Buffer.from(`${keyId}:${keySecret}`).toString('base64');
+
+    const response = await fetch('https://api.razorpay.com/v1/orders', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${credentials}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        amount: Math.round(amount * 100),
+        currency: 'INR',
+        receipt: `receipt_${Date.now()}`,
+      }),
     });
+
+    const order = await response.json();
     return NextResponse.json({ orderId: order.id });
   } catch (err) {
     console.error('Razorpay error:', err);
