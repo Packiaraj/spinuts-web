@@ -1,8 +1,16 @@
 'use client';
 import Link from 'next/link';
-import Image from 'next/image';
+import { useState } from 'react';
 import { Product } from '@/lib/types';
 import { useStore } from '@/lib/store';
+
+const CATEGORY_EMOJI: Record<string, string> = {
+  spices: '🌶️',
+  nuts: '🥜',
+  seeds: '🌱',
+  millets: '🌾',
+  'dry-fruits': '🍇',
+};
 
 interface Props {
   product: Product;
@@ -13,21 +21,26 @@ export default function ProductCard({ product }: Props) {
   const price = currency === 'INR' ? product.price_inr : product.price_usd;
   const originalPrice = currency === 'INR' ? product.original_price_inr : product.original_price_usd;
   const symbol = currency === 'INR' ? '₹' : '$';
+  const [imgError, setImgError] = useState(false);
+
+  const hasImage = product.images?.[0] && !imgError;
 
   return (
     <div className="bg-white group" style={{ border: '0.5px solid rgba(0,0,0,0.10)' }}>
       <Link href={`/products/${product.id}`}>
-        <div className="relative aspect-square overflow-hidden bg-gray-50">
-          {product.images?.[0] ? (
-            <Image
+        <div className="relative aspect-square overflow-hidden" style={{ backgroundColor: '#f5f0eb' }}>
+          {hasImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
               src={product.images[0]}
               alt={product.name}
-              fill
-              className="object-cover group-hover:scale-103 transition-transform duration-500"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              onError={() => setImgError(true)}
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#f5f0eb' }}>
-              <span className="text-4xl">🌿</span>
+            <div className="w-full h-full flex flex-col items-center justify-center gap-2">
+              <span className="text-5xl">{CATEGORY_EMOJI[product.category] || '🌿'}</span>
+              <span className="label-tag text-gray-400">{product.category}</span>
             </div>
           )}
           <div className="absolute top-3 left-3">
