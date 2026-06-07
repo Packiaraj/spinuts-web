@@ -1,9 +1,9 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import AdminNav from '@/components/AdminNav';
-import { Plus, Edit2, Trash2, X } from 'lucide-react';
+import { Plus, Edit2, Trash2, X, Upload, ImageIcon } from 'lucide-react';
 import { Product } from '@/lib/types';
-import { SAMPLE_PRODUCTS } from '@/lib/sampleData';
+import Image from 'next/image';
 
 const EMPTY: Partial<Product> = {
   name: '', description: '', price_inr: 0, price_usd: 0,
@@ -12,25 +12,47 @@ const EMPTY: Partial<Product> = {
 };
 
 export default function AdminProductsPage() {
-  const [products, setProducts] = useState<Product[]>(SAMPLE_PRODUCTS);
+  const [products, setProducts] = useState<Product[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Partial<Product>>(EMPTY);
   const [isNew, setIsNew] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     async function load() {
       try {
         const { supabase } = await import('@/lib/supabase');
         const { data } = await supabase.from('products').select('*').order('created_at', { ascending: false });
-        if (data && data.length > 0) setProducts(data);
-      } catch { /* sample */ }
+        if (data) setProducts(data);
+      } catch { /* ignore */ }
     }
     load();
   }, []);
 
   function openNew() { setEditing(EMPTY); setIsNew(true); setShowForm(true); }
-  function openEdit(p: Product) { setEditing(p); setIsNew(false); setShowForm(true); }
+  function openEdit(p: Product) { setEditing({ ...p }); setIsNew(false); setShowForm(true); }
+
+  async function uploadImage(file: File) {
+    setUploading(true);
+    try {
+      const { supabase } = await import('@/lib/supabase');
+      const ext = file.name.split('.').pop();
+      const path = `products/${Date.now()}.${ext}`;
+      const { error } = await supabase.storage.from('products').upload(path, file, { upsert: true });
+      if (error) throw error;
+      const { data } = supabase.storage.from('products').getPublicUrl(path);
+      setEditing((f) => ({ ...f, images: [...(f.images || []), data.publicUrl] }));
+    } catch (e) {
+      alert('Image upload failed: ' + (e instanceof Error ? e.message : 'unknown error'));
+    }
+    setUploading(false);
+  }
+
+  function removeImage(url: string) {
+    setEditing((f) => ({ ...f, images: (f.images || []).filter((i) => i !== url) }));
+  }
 
   async function save() {
     setSaving(true);
@@ -43,16 +65,11 @@ export default function AdminProductsPage() {
         const { data } = await supabase.from('products').update(editing).eq('id', editing.id).select().single();
         if (data) setProducts((prev) => prev.map((p) => p.id === data.id ? data : p));
       }
-    } catch { /* demo mode — just update local state */
-      if (isNew) {
-        const newP = { ...editing, id: Date.now().toString(), created_at: new Date().toISOString() } as Product;
-        setProducts((prev) => [newP, ...prev]);
-      } else {
-        setProducts((prev) => prev.map((p) => p.id === editing.id ? { ...p, ...editing } as Product : p));
-      }
+      setShowForm(false);
+    } catch (e) {
+      alert('Save failed: ' + (e instanceof Error ? e.message : 'unknown error'));
     }
     setSaving(false);
-    setShowForm(false);
   }
 
   async function deleteProduct(id: string) {
@@ -60,7 +77,7 @@ export default function AdminProductsPage() {
     try {
       const { supabase } = await import('@/lib/supabase');
       await supabase.from('products').delete().eq('id', id);
-    } catch { /* demo */ }
+    } catch { /* ignore */ }
     setProducts((prev) => prev.filter((p) => p.id !== id));
   }
 
@@ -84,8 +101,8 @@ export default function AdminProductsPage() {
           <table className="w-full text-sm">
             <thead>
               <tr style={{ borderBottom: '0.5px solid rgba(0,0,0,0.08)' }}>
-                {['Product', 'Category', 'Price (INR)', 'Stock', 'Status', ''].map((h) => (
-                  <th key={h} className="label-tag text-left px-4 py-3 text-gray-400 font-400">{h}</th>
+                {['Image', 'Product', 'Category', 'Price (INR)', 'Stock', 'Status', ''].map((h) => (
+                  <th key={h} className="label-tag text-left px-4 py-3 text-gray-400">{h}</th>
                 ))}
               </tr>
             </thead>
@@ -94,7 +111,15 @@ export default function AdminProductsPage() {
                 <tr key={p.id} style={{ borderBottom: '0.5px solid rgba(0,0,0,0.04)' }}
                   className="hover:bg-gray-50 transition-colors">
                   <td className="px-4 py-3">
-                    <p className="font-medium">{p.name}</p>
+                    <div className="w-12 h-12 relative rounded overflow-hidden" style={{ backgroundColor: '#f5f0eb' }}>
+                      {p.images?.[0]
+                        ? <Image src={p.images[0]} alt={p.name} fill className="object-cover" />
+                        : <div className="w-full h-full flex items-center justify-center"><ImageIcon size={16} className="text-gray-300" /></div>
+                      }
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <p className="font-medium">{p.name.split(' / ')[0]}</p>
                     <p className="text-xs text-gray-400">{p.origin}</p>
                   </td>
                   <td className="px-4 py-3">
@@ -138,10 +163,46 @@ export default function AdminProductsPage() {
                 <button onClick={() => setShowForm(false)}><X size={18} className="text-gray-400" /></button>
               </div>
 
+              {/* Image upload */}
+              <div className="mb-6">
+                <label className="label-tag text-gray-400 block mb-2">Product Images</label>
+                <div className="flex flex-wrap gap-3 mb-3">
+                  {(editing.images || []).map((url) => (
+                    <div key={url} className="relative w-24 h-24 rounded overflow-hidden group" style={{ border: '0.5px solid rgba(0,0,0,0.1)' }}>
+                      <Image src={url} alt="product" fill className="object-cover" />
+                      <button
+                        onClick={() => removeImage(url)}
+                        className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
+                      >
+                        <X size={18} className="text-white" />
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    onClick={() => fileRef.current?.click()}
+                    disabled={uploading}
+                    className="w-24 h-24 flex flex-col items-center justify-center gap-1 text-gray-400 hover:text-[#1B4332] transition-colors disabled:opacity-50"
+                    style={{ border: '0.5px dashed rgba(0,0,0,0.2)' }}
+                  >
+                    <Upload size={18} />
+                    <span className="label-tag">{uploading ? 'Uploading...' : 'Upload'}</span>
+                  </button>
+                  <input
+                    ref={fileRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadImage(f); e.target.value = ''; }}
+                  />
+                </div>
+                <p className="text-xs text-gray-400">First image is shown as the main product photo. JPG/PNG/WEBP.</p>
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-2">
-                  <label className="label-tag text-gray-400 block mb-1">Product Name</label>
+                  <label className="label-tag text-gray-400 block mb-1">Product Name (English / தமிழ்)</label>
                   <input className={inp} style={inpStyle} value={editing.name || ''}
+                    placeholder="e.g. Black Pepper / மிளகு"
                     onChange={(e) => setEditing((f) => ({ ...f, name: e.target.value }))} />
                 </div>
                 <div className="col-span-2">
@@ -201,7 +262,7 @@ export default function AdminProductsPage() {
               </div>
 
               <div className="flex gap-3 mt-8">
-                <button onClick={save} disabled={saving}
+                <button onClick={save} disabled={saving || uploading}
                   className="flex-1 py-3 label-tag disabled:opacity-50"
                   style={{ backgroundColor: '#1B4332', color: '#FFF8F0' }}>
                   {saving ? 'Saving...' : 'Save Product'}
