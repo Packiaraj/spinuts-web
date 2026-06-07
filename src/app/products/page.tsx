@@ -26,16 +26,27 @@ function ProductsInner() {
   const initCat = (searchParams.get('category') as Category) || 'all';
   const [activeCategory, setActiveCategory] = useState<Category>(initCat);
   const [sort, setSort] = useState('default');
-  const [products, setProducts] = useState<Product[]>(SAMPLE_PRODUCTS);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const [maxPrice, setMaxPrice] = useState(2000);
 
   useEffect(() => {
     async function fetchProducts() {
       try {
         const { supabase } = await import('@/lib/supabase');
-        const { data } = await supabase.from('products').select('*').eq('active', true);
-        if (data && data.length > 0) setProducts(data);
-      } catch { /* use sample */ }
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .eq('active', true)
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        setProducts(data || []);
+      } catch (e) {
+        console.error('Failed to load products:', e);
+        setProducts(SAMPLE_PRODUCTS);
+      } finally {
+        setLoading(false);
+      }
     }
     fetchProducts();
   }, []);
@@ -89,7 +100,7 @@ function ProductsInner() {
         {/* Grid */}
         <div className="flex-1">
           <div className="flex items-center justify-between mb-6">
-            <p className="text-sm text-gray-500">{filtered.length} products</p>
+            <p className="text-sm text-gray-500">{loading ? 'Loading...' : `${filtered.length} products`}</p>
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value)}
@@ -101,11 +112,28 @@ function ProductsInner() {
               ))}
             </select>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {filtered.map((p) => <ProductCard key={p.id} product={p} />)}
-          </div>
-          {filtered.length === 0 && (
-            <p className="text-gray-500 py-20 text-center">No products found.</p>
+          {loading ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {Array.from({ length: 9 }).map((_, i) => (
+                <div key={i} className="bg-white animate-pulse" style={{ border: '0.5px solid rgba(0,0,0,0.08)' }}>
+                  <div className="aspect-square" style={{ backgroundColor: '#f0ebe5' }} />
+                  <div className="p-4 space-y-2">
+                    <div className="h-2 rounded" style={{ backgroundColor: '#ede8e2', width: '40%' }} />
+                    <div className="h-3 rounded" style={{ backgroundColor: '#ede8e2', width: '80%' }} />
+                    <div className="h-2 rounded" style={{ backgroundColor: '#ede8e2', width: '30%' }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {filtered.map((p) => <ProductCard key={p.id} product={p} />)}
+              </div>
+              {filtered.length === 0 && (
+                <p className="text-gray-500 py-20 text-center">No products found.</p>
+              )}
+            </>
           )}
         </div>
       </div>
