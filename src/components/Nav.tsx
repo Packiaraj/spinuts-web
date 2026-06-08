@@ -18,7 +18,7 @@ export default function Nav() {
   return (
     <>
       <nav
-        className="sticky top-0 z-50 transition-all duration-300"
+        className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
         style={{
           backgroundColor: scrolled ? 'rgba(251,245,236,0.97)' : 'transparent',
           borderBottom: `1px solid ${scrolled ? '#DEC9A8' : 'transparent'}`,
