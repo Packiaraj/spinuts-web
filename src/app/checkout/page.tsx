@@ -3,6 +3,10 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/lib/store';
 import { SpiceLoader } from '@/components/SpiceLoader';
+import { QRCodeSVG } from 'qrcode.react';
+
+const UPI_ID = '9842123958@postbank';
+const UPI_NAME = 'SHANTHI VELLAICHAMY';
 
 type PaymentMethod = 'razorpay' | 'gpay' | 'phonepe' | 'cod';
 
@@ -237,28 +241,72 @@ export default function CheckoutPage() {
           <div>
             <p className="label-tag mb-4" style={{ color: '#1B4332' }}>Payment Method</p>
 
-            {/* Quick UPI buttons */}
-            <p className="label-tag text-gray-400 mb-2">Quick Pay via UPI</p>
-            <div className="grid grid-cols-2 gap-3 mb-4">
-              {[
-                { id: 'gpay' as const, label: 'GPay', emoji: '🟢', color: '#1a73e8', bg: '#e8f0fe' },
-                { id: 'phonepe' as const, label: 'PhonePe', emoji: '🟣', color: '#5f259f', bg: '#f3e8ff' },
-              ].map((app) => (
-                <label key={app.id} className="flex items-center gap-3 p-3 cursor-pointer transition-all"
-                  style={{
-                    border: `0.5px solid ${paymentMethod === app.id ? app.color : 'rgba(0,0,0,0.12)'}`,
-                    backgroundColor: paymentMethod === app.id ? app.bg : 'white',
-                  }}>
-                  <input type="radio" name="payment" value={app.id}
-                    checked={paymentMethod === app.id} onChange={() => setPaymentMethod(app.id)} />
-                  <span className="text-lg">{app.emoji}</span>
-                  <div>
-                    <p className="text-sm font-medium">{app.label}</p>
-                    <p className="text-xs text-gray-400">UPI · Instant</p>
-                  </div>
-                </label>
-              ))}
+            {/* UPI Apps */}
+            <p className="label-tag text-gray-400 mb-3">Pay via UPI App</p>
+            <div className="grid grid-cols-3 gap-3 mb-4">
+              {/* GPay */}
+              <label className="flex flex-col items-center gap-2 p-3 cursor-pointer transition-all rounded-sm"
+                style={{ border: `1.5px solid ${paymentMethod === 'gpay' ? '#1a73e8' : 'rgba(0,0,0,0.1)'}`, backgroundColor: paymentMethod === 'gpay' ? '#e8f0fe' : 'white' }}>
+                <input type="radio" name="payment" value="gpay" className="hidden"
+                  checked={paymentMethod === 'gpay'} onChange={() => setPaymentMethod('gpay')} />
+                <svg viewBox="0 0 48 48" width="36" height="36">
+                  <path fill="#4285F4" d="M23.9 20.3v3.9h5.8c-.2 1.5-1.7 4.4-5.8 4.4-3.5 0-6.3-2.9-6.3-6.5s2.8-6.5 6.3-6.5c2 0 3.3.8 4 1.6l2.7-2.6C28.8 13.1 26.6 12 23.9 12c-5.5 0-10 4.5-10 10s4.5 10 10 10c5.8 0 9.6-4.1 9.6-9.8 0-.7-.1-1.2-.2-1.7h-9.4z"/>
+                  <path fill="#34A853" d="M23.9 32c2.8 0 5.1-.9 6.8-2.5l-3.2-2.5c-.9.6-2 1-3.6 1-2.8 0-5.1-1.9-5.9-4.4h-3.3v2.6C19 29.9 21.3 32 23.9 32z"/>
+                  <path fill="#FBBC05" d="M18 23.6c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2v-2.6h-3.3c-.7 1.4-1.1 2.9-1.1 4.6s.4 3.2 1.1 4.6L18 23.6z"/>
+                  <path fill="#EA4335" d="M23.9 15.6c1.6 0 2.6.7 3.2 1.3l2.4-2.3C27.9 13.2 26.1 12 23.9 12c-2.6 0-4.9 1.1-6.5 2.9l3.3 2.6c.8-1.8 2.4-2.9 3.2-1.9z"/>
+                </svg>
+                <span className="text-xs font-medium text-gray-700">GPay</span>
+              </label>
+
+              {/* PhonePe */}
+              <label className="flex flex-col items-center gap-2 p-3 cursor-pointer transition-all rounded-sm"
+                style={{ border: `1.5px solid ${paymentMethod === 'phonepe' ? '#5f259f' : 'rgba(0,0,0,0.1)'}`, backgroundColor: paymentMethod === 'phonepe' ? '#f3e8ff' : 'white' }}>
+                <input type="radio" name="payment" value="phonepe" className="hidden"
+                  checked={paymentMethod === 'phonepe'} onChange={() => setPaymentMethod('phonepe')} />
+                <svg viewBox="0 0 48 48" width="36" height="36">
+                  <rect width="48" height="48" rx="10" fill="#5f259f"/>
+                  <path fill="white" d="M24 8c-8.8 0-16 7.2-16 16s7.2 16 16 16 16-7.2 16-16S32.8 8 24 8zm6.5 17.5c0 3.6-2.9 6.5-6.5 6.5h-4v3l-4-4 4-4v3h4c1.4 0 2.5-1.1 2.5-2.5v-8.5H30v6.5z"/>
+                </svg>
+                <span className="text-xs font-medium text-gray-700">PhonePe</span>
+              </label>
+
+              {/* QR Code */}
+              <label className="flex flex-col items-center gap-2 p-3 cursor-pointer transition-all rounded-sm"
+                style={{ border: `1.5px solid ${paymentMethod === 'razorpay' && false ? '#1B4332' : paymentMethod === 'qr' ? '#1B4332' : 'rgba(0,0,0,0.1)'}`, backgroundColor: (paymentMethod as string) === 'qr' ? 'rgba(27,67,50,0.05)' : 'white' }}>
+                <input type="radio" name="payment" value="qr" className="hidden"
+                  checked={(paymentMethod as string) === 'qr'} onChange={() => setPaymentMethod('razorpay')} />
+                <div className="text-2xl">⬛</div>
+                <span className="text-xs font-medium text-gray-700">Scan QR</span>
+              </label>
             </div>
+
+            {/* QR Code Panel — shown when GPay/PhonePe/QR selected */}
+            {(paymentMethod === 'gpay' || paymentMethod === 'phonepe') && (
+              <div className="mb-4 p-5 flex flex-col items-center gap-3 animate-fadeIn"
+                style={{ border: '0.5px solid rgba(0,0,0,0.1)', backgroundColor: '#fafafa' }}>
+                <p className="label-tag text-gray-500">
+                  Scan with {paymentMethod === 'gpay' ? 'Google Pay' : 'PhonePe'} to pay ₹{total.toFixed(0)}
+                </p>
+                <div className="p-3 bg-white rounded" style={{ border: '0.5px solid rgba(0,0,0,0.08)' }}>
+                  <QRCodeSVG
+                    value={`upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(UPI_NAME)}&am=${total.toFixed(0)}&cu=INR&tn=${encodeURIComponent('SpiNuts Order')}`}
+                    size={160}
+                    fgColor="#1B4332"
+                    bgColor="#ffffff"
+                    level="M"
+                  />
+                </div>
+                <div className="text-center">
+                  <p className="text-xs text-gray-500">UPI ID</p>
+                  <p className="text-sm font-medium mt-0.5" style={{ color: '#1B4332' }}>{UPI_ID}</p>
+                  <p className="text-xs text-gray-400">{UPI_NAME}</p>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-gray-400">
+                  <span>🔒</span>
+                  <span>Open your UPI app → Scan QR → Pay ₹{total.toFixed(0)}</span>
+                </div>
+              </div>
+            )}
 
             <div className="space-y-3">
               <label className="flex items-start gap-4 p-4 cursor-pointer transition-colors"
@@ -271,7 +319,13 @@ export default function CheckoutPage() {
                     <p className="text-sm font-medium">All Payment Options</p>
                     <span className="label-tag px-2 py-0.5 text-white" style={{ backgroundColor: '#1B4332', fontSize: '0.6rem' }}>Recommended</span>
                   </div>
-                  <p className="text-xs text-gray-500">UPI · Cards · Net Banking · Paytm · Wallets</p>
+                  <p className="text-xs text-gray-500 mb-2">UPI · Cards · Net Banking · Paytm · Wallets</p>
+                  <div className="flex gap-1.5 flex-wrap">
+                    {['VISA', 'MC', 'UPI', 'NB', 'Paytm'].map((m) => (
+                      <span key={m} className="text-xs px-1.5 py-0.5 text-gray-400"
+                        style={{ border: '0.5px solid rgba(0,0,0,0.1)' }}>{m}</span>
+                    ))}
+                  </div>
                 </div>
               </label>
 
@@ -281,11 +335,10 @@ export default function CheckoutPage() {
                 <input type="radio" name="payment" value="cod" className="mt-0.5"
                   checked={paymentMethod === 'cod'} onChange={() => setPaymentMethod('cod')} />
                 <div>
-                  <p className="text-sm font-medium mb-1">Cash on Delivery</p>
+                  <p className="text-sm font-medium mb-1">🚚 Cash on Delivery</p>
                   <p className="text-xs text-gray-500">Pay in cash when your order arrives</p>
                 </div>
               </label>
-
             </div>
           </div>
 
