@@ -14,22 +14,24 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6 py-16">
         <div className="grid md:grid-cols-4 gap-12 mb-12">
           {/* Brand */}
-          <div className="md:col-span-2">
-            <div className="flex flex-col items-start mb-6">
-              <Image src="/logo.png" alt="SpiNuts" width={140} height={140} style={{ objectFit: 'contain' }} />
-              <p style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.5rem', fontWeight: 700, color: '#FDF6EE', marginTop: 8 }}>SpiNuts</p>
-              <p className="tag" style={{ color: '#B8860B', fontSize: '0.6rem', marginTop: 4, letterSpacing: '0.15em' }}>Pure Indian Spices · Est. 2024</p>
-            </div>
-            <p style={{ color: 'rgba(253,246,238,0.5)', fontSize: '0.88rem', lineHeight: 1.8, maxWidth: 280 }}>
-              Crafted blends of pure Indian spices &amp; premium nuts. Organic, artisanal, and delivered straight from Indian farms to your kitchen.
-            </p>
-            <div className="flex gap-4 mt-5">
-              {['Instagram', 'Facebook'].map((s) => (
-                <a key={s} href="#" className="tag transition-opacity hover:opacity-100"
-                  style={{ color: 'rgba(253,246,238,0.4)', fontSize: '0.6rem' }}>
-                  {s}
-                </a>
-              ))}
+          <div className="md:col-span-2 flex items-start gap-6">
+            {/* Logo */}
+            <Image src="/logo.png" alt="SpiNuts" width={180} height={180} style={{ objectFit: 'contain', flexShrink: 0 }} />
+            {/* Text */}
+            <div className="pt-2">
+              <p style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.6rem', fontWeight: 700, color: '#FDF6EE', marginBottom: 4 }}>SpiNuts</p>
+              <p className="tag" style={{ color: '#B8860B', fontSize: '0.6rem', letterSpacing: '0.15em', marginBottom: 14 }}>Pure Indian Spices · Est. 2024</p>
+              <p style={{ color: 'rgba(253,246,238,0.5)', fontSize: '0.88rem', lineHeight: 1.8, maxWidth: 260 }}>
+                Crafted blends of pure Indian spices &amp; premium nuts. Organic, artisanal, delivered straight from Indian farms to your kitchen.
+              </p>
+              <div className="flex gap-4 mt-5">
+                {['Instagram', 'Facebook'].map((s) => (
+                  <a key={s} href="#" className="tag transition-opacity hover:opacity-100"
+                    style={{ color: 'rgba(253,246,238,0.4)', fontSize: '0.6rem' }}>
+                    {s}
+                  </a>
+                ))}
+              </div>
             </div>
           </div>
 
