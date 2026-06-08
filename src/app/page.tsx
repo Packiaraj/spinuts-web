@@ -185,36 +185,38 @@ export default function HomePage() {
   const filtered = activeCategory === 'all' ? products : products.filter((p) => p.category === activeCategory);
 
   return (
-    <div style={{ backgroundColor: '#FBF5EC' }}>
+    <div style={{ position: 'relative' }}>
 
-      {/* ── HERO: full banner image, no crop ── */}
-      <section className="hero-line-1 relative w-full">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/banner.jpg"
-          alt="SpiNuts — Pure Indian Spices & Premium Nuts"
-          style={{ width: '100%', height: 'auto', display: 'block' }}
-        />
-        {/* Transparent clickable overlay on the "SHOP OUR BLENDS" button in the image */}
-        <Link
-          href="/products"
-          aria-label="Shop Our Blends"
-          style={{
-            position: 'absolute',
-            top: '72%',
-            left: '52%',
-            width: '38%',
-            height: '9%',
-            borderRadius: 8,
-            cursor: 'pointer',
-            /* Debug: uncomment to see overlay */
-            /* backgroundColor: 'rgba(255,0,0,0.4)', */
-          }}
-        />
-      </section>
+      {/* ── BANNER: sticky behind content as user scrolls ── */}
+      <div style={{ position: 'sticky', top: 0, zIndex: 0 }}>
+        <div className="hero-line-1 relative w-full">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/banner.jpg"
+            alt="SpiNuts — Pure Indian Spices & Premium Nuts"
+            style={{ width: '100%', height: 'auto', display: 'block' }}
+          />
+          {/* Transparent clickable overlay on the "SHOP OUR BLENDS" button in the image */}
+          <Link
+            href="/products"
+            aria-label="Shop Our Blends"
+            style={{
+              position: 'absolute',
+              top: '72%',
+              left: '52%',
+              width: '38%',
+              height: '9%',
+              borderRadius: 8,
+              cursor: 'pointer',
+              /* Debug: uncomment to see overlay */
+              /* backgroundColor: 'rgba(255,0,0,0.4)', */
+            }}
+          />
+        </div>
+      </div>
 
-      {/* ── rest of page ── */}
-      <div>
+      {/* ── Content scrolls OVER the sticky banner ── */}
+      <div style={{ position: 'relative', zIndex: 1, backgroundColor: '#FBF5EC' }}>
 
       {/* ── TRUST ── */}
       <TrustBar />
