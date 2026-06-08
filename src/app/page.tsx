@@ -97,10 +97,10 @@ function StorySection() {
             <em style={{ color: '#D4A853' }}>the Western Ghats.</em>
           </h2>
           <p style={{ color: 'rgba(253,246,238,0.6)', lineHeight: 1.85, marginBottom: 18, fontSize: '0.95rem' }}>
-            SpiNuts began with a simple belief: the best spices are whole spices, freshly sourced. We work directly with farmers and forest communities deep in the Western Ghats — one of the world's richest biodiversity hotspots.
+            SpiNuts began with a simple belief: the best spices are whole spices, freshly sourced. We work directly with farmers and forest communities deep in the Western Ghats — one of the world&apos;s richest biodiversity hotspots.
           </p>
           <p style={{ color: 'rgba(253,246,238,0.6)', lineHeight: 1.85, marginBottom: 36, fontSize: '0.95rem' }}>
-            Every batch is traceable to its source. Every product is packed within days of harvest. That's the SpiNuts promise.
+            Every batch is traceable to its source. Every product is packed within days of harvest. That&apos;s the SpiNuts promise.
           </p>
           <Link href="/story"
             className="inline-flex items-center gap-2 text-sm font-semibold transition-all hover:gap-4"
