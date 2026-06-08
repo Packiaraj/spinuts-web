@@ -188,72 +188,29 @@ export default function HomePage() {
   return (
     <div style={{ backgroundColor: '#FBF5EC' }}>
 
-      {/* ── HERO ── */}
-      <section style={{ backgroundColor: '#F5EDE0', position: 'relative', overflow: 'hidden' }}>
-        {/* invisible placeholder to keep structure */}
-        <div style={{ display: 'none' }} />
-
-        {/* Top: Logo + Text — matches banner layout */}
-        <div className="max-w-7xl mx-auto px-6 pt-12 pb-8 grid md:grid-cols-2 gap-8 items-center">
-          <div className="hero-line-1 flex justify-center md:justify-start">
-            <Image src="/logo.png" alt="SpiNuts" width={210} height={210} style={{ objectFit: 'contain' }} priority />
-          </div>
-          <div>
-            <h1 className="hero-line-2 mb-4" style={{
-              fontFamily: "'Playfair Display', serif",
-              fontSize: 'clamp(1.8rem, 4vw, 3rem)',
-              color: '#2C1708', fontWeight: 700, lineHeight: 1.2,
-            }}>
-              Crafted Blends of<br />
-              <em style={{ color: '#B8860B', fontStyle: 'italic' }}>Pure Indian Spices</em><br />
-              &amp; Premium Nuts
-            </h1>
-            <p className="hero-line-3 mb-8" style={{ color: '#7A5C3E', fontSize: '1rem', lineHeight: 1.75 }}>
-              Discover the essence of authentic flavour in every bite.
-            </p>
-            <div className="hero-line-4 flex flex-wrap gap-3">
-              <Link href="/products"
-                className="tag px-7 py-3.5 transition-all hover:opacity-90"
-                style={{ backgroundColor: '#B8860B', color: '#FBF5EC', borderRadius: 4 }}>
-                Shop Our Blends →
-              </Link>
-              <Link href="/story"
-                className="tag px-7 py-3.5 transition-all hover:bg-stone-100"
-                style={{ border: '1.5px solid #2C1708', color: '#2C1708', borderRadius: 4 }}>
-                Our Story
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom: Banner image with clickable button overlay */}
-        <div className="hero-line-2 relative w-full" style={{ maxHeight: 500, overflow: 'hidden' }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/banner.jpg" alt="Pure Indian Spices and Premium Nuts"
-            className="w-full object-cover object-top" style={{ maxHeight: 500, display: 'block' }} />
-
-          {/* Transparent overlay exactly on the "SHOP OUR BLENDS" button in the image */}
-          <Link href="/products" style={{
+      {/* ── HERO: full banner image only ── */}
+      <section className="hero-line-1 relative w-full">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/banner.jpg"
+          alt="SpiNuts — Pure Indian Spices & Premium Nuts"
+          className="w-full block"
+          style={{ objectFit: 'cover' }}
+        />
+        {/* Transparent click overlay on the baked-in "SHOP OUR BLENDS" button */}
+        <Link
+          href="/products"
+          aria-label="Shop Our Blends"
+          style={{
             position: 'absolute',
-            top: '30%',
+            top: '38%',
             left: '52%',
-            width: '42%',
-            height: '11%',
+            width: '43%',
+            height: '10%',
             borderRadius: 6,
             cursor: 'pointer',
-            /* Uncomment below to debug position: */
-            /* backgroundColor: 'rgba(255,0,0,0.3)', */
-          }} aria-label="Shop Our Blends" />
-
-          <div style={{
-            position: 'absolute', bottom: 0, left: 0, right: 0, padding: '16px 32px',
-            background: 'linear-gradient(to top, rgba(44,23,8,0.65) 0%, transparent 100%)',
-            display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end',
-          }}>
-            <span className="tag" style={{ color: 'rgba(251,245,236,0.8)', letterSpacing: '0.18em' }}>· ORGANIC ·</span>
-            <span className="tag" style={{ color: 'rgba(251,245,236,0.8)', letterSpacing: '0.18em' }}>· PREMIUM · ARTISANAL ·</span>
-          </div>
-        </div>
+          }}
+        />
       </section>
 
       {/* ── TRUST ── */}
