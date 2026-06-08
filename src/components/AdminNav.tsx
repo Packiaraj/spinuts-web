@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Package, ShoppingCart, Users, BarChart2, FileText, LogOut } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, Users, BarChart2, FileText, Truck, LogOut } from 'lucide-react';
 
 const NAV_ITEMS = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { href: '/admin/inventory', label: 'Inventory', icon: BarChart2 },
   { href: '/admin/orders', label: 'Orders', icon: ShoppingCart },
   { href: '/admin/customers', label: 'Customers', icon: Users },
+  { href: '/admin/shipping', label: 'Shipping', icon: Truck },
   { href: '/admin/content', label: 'Site Content', icon: FileText },
 ];
 

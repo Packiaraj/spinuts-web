@@ -201,7 +201,31 @@ export default function CheckoutPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-12">
-      <h1 className="text-2xl font-medium mb-10" style={{ fontWeight: 500 }}>Checkout</h1>
+      <h1 className="text-2xl font-medium mb-6" style={{ fontWeight: 500 }}>Checkout</h1>
+
+      {/* Shipping Info Banner */}
+      <div className="flex flex-col sm:flex-row gap-3 mb-8">
+        <div className="flex items-center gap-3 flex-1 px-4 py-3 text-sm"
+          style={{ border: '0.5px solid rgba(27,67,50,0.2)', backgroundColor: 'rgba(27,67,50,0.03)' }}>
+          <span className="text-xl">🏠</span>
+          <div>
+            <p className="font-medium text-xs" style={{ color: '#1B4332' }}>Tamil Nadu</p>
+            <p className="text-xs text-gray-500">
+              Free delivery on orders above ₹{shippingConfig.tn_free_above} · Otherwise ₹{shippingConfig.tn_cost}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 flex-1 px-4 py-3 text-sm"
+          style={{ border: '0.5px solid rgba(212,160,23,0.25)', backgroundColor: 'rgba(212,160,23,0.03)' }}>
+          <span className="text-xl">🚚</span>
+          <div>
+            <p className="font-medium text-xs" style={{ color: '#D4A017' }}>Other States</p>
+            <p className="text-xs text-gray-500">
+              Flat ₹{shippingConfig.other_cost} delivery charge across India
+            </p>
+          </div>
+        </div>
+      </div>
 
       <form onSubmit={handleSubmit} className="grid md:grid-cols-3 gap-10">
         {/* Left */}
