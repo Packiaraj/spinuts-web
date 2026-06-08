@@ -5,9 +5,9 @@ export default function Footer() {
   return (
     <footer style={{ backgroundColor: '#1A0E05', color: '#FDF6EE' }}>
       {/* Top band */}
-      <div style={{ backgroundColor: '#C4783A', padding: '14px 24px', textAlign: 'center' }}>
-        <p className="tag" style={{ color: '#FDF6EE', letterSpacing: '0.2em', fontSize: '0.6rem' }}>
-          🌶️ Pure Spices · Traditional Blend · Western Ghats · Farm Direct 🥜
+      <div style={{ backgroundColor: '#B8860B', padding: '14px 24px', textAlign: 'center' }}>
+        <p className="tag" style={{ color: '#FBF5EC', letterSpacing: '0.2em', fontSize: '0.6rem' }}>
+          🌶️ Pure Indian Spices · Est. 2024 · Organic · Premium · Artisanal 🥜
         </p>
       </div>
 
@@ -28,13 +28,13 @@ export default function Footer() {
                 <p style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.2rem', fontWeight: 700, color: '#FDF6EE' }}>
                   SpiNuts
                 </p>
-                <p className="tag" style={{ color: '#C4783A', fontSize: '0.52rem', marginTop: 2 }}>
-                  Pure Spices · Traditional Blend
+                <p className="tag" style={{ color: '#B8860B', fontSize: '0.52rem', marginTop: 2 }}>
+                  Pure Indian Spices · Est. 2024
                 </p>
               </div>
             </div>
             <p style={{ color: 'rgba(253,246,238,0.5)', fontSize: '0.88rem', lineHeight: 1.8, maxWidth: 280 }}>
-              Sourced directly from real farmers of the Western Ghats. Whole, pure, and unadulterated — from forest to your kitchen.
+              Crafted blends of pure Indian spices &amp; premium nuts. Organic, artisanal, and delivered straight from Indian farms to your kitchen.
             </p>
             <div className="flex gap-4 mt-5">
               {['Instagram', 'Facebook'].map((s) => (

@@ -16,9 +16,9 @@ const CATEGORIES: { id: Category; label: string; emoji: string }[] = [
 ];
 
 const TRUST = [
-  { icon: '🌿', label: 'Farm Direct', sub: 'No middlemen, ever' },
-  { icon: '🏔️', label: 'Western Ghats', sub: 'Biodiversity hotspot' },
-  { icon: '✦', label: 'Whole & Pure', sub: 'Unprocessed, natural' },
+  { icon: '🌿', label: 'Organic', sub: 'No chemicals, ever' },
+  { icon: '⭐', label: 'Premium Quality', sub: 'Carefully handpicked' },
+  { icon: '🏺', label: 'Artisanal', sub: 'Traditional methods' },
   { icon: '🚚', label: 'Pan India', sub: 'Fast, careful delivery' },
 ];
 
@@ -81,8 +81,8 @@ function StorySection() {
             position: 'absolute', bottom: 0, left: 0, right: 0,
             padding: '24px', background: 'linear-gradient(to top, rgba(44,26,14,0.8), transparent)',
           }}>
-            <p className="tag" style={{ color: 'rgba(212,168,83,0.9)', letterSpacing: '0.18em' }}>
-              Western Ghats · Forest Farms
+            <p className="tag" style={{ color: 'rgba(212,168,42,0.9)', letterSpacing: '0.18em' }}>
+              Pure Indian Spices · Est. 2024
             </p>
           </div>
         </div>
@@ -94,11 +94,11 @@ function StorySection() {
             fontSize: 'clamp(2rem, 3.5vw, 3rem)',
             color: '#FDF6EE', marginBottom: 24,
           }}>
-            From the heart of<br />
-            <em style={{ color: '#D4A853' }}>the Western Ghats.</em>
+            From Indian farms<br />
+            <em style={{ color: '#D4A82A' }}>to your kitchen.</em>
           </h2>
           <p style={{ color: 'rgba(253,246,238,0.6)', lineHeight: 1.85, marginBottom: 18, fontSize: '0.95rem' }}>
-            SpiNuts began with a simple belief: the best spices are whole spices, freshly sourced. We work directly with farmers and forest communities deep in the Western Ghats — one of the world&apos;s richest biodiversity hotspots.
+            SpiNuts began with a simple belief: the best spices are whole spices, freshly sourced. We work directly with Indian farmers and communities — bringing you pure, authentic flavours without any middlemen.
           </p>
           <p style={{ color: 'rgba(253,246,238,0.6)', lineHeight: 1.85, marginBottom: 36, fontSize: '0.95rem' }}>
             Every batch is traceable to its source. Every product is packed within days of harvest. That&apos;s the SpiNuts promise.
@@ -208,26 +208,35 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-6 py-20 w-full grid md:grid-cols-2 gap-16 items-center">
           {/* Text */}
           <div>
-            <p className="hero-line-1 tag mb-6" style={{ color: '#C4783A', letterSpacing: '0.2em' }}>
-              Western Ghats · Forest to Table
+            <p className="hero-line-1 tag mb-5" style={{ color: '#D4A82A', letterSpacing: '0.22em' }}>
+              Est. 2024 · Organic · Premium · Artisanal
             </p>
-            <h1 className="hero-line-2 mb-7" style={{
+            <h1 className="hero-line-2 mb-6" style={{
               fontFamily: "'Playfair Display', serif",
-              fontSize: 'clamp(2.8rem, 6vw, 5rem)',
-              color: '#FDF6EE', fontWeight: 700, lineHeight: 1.08,
+              fontSize: 'clamp(2.4rem, 5.5vw, 4.5rem)',
+              color: '#FBF5EC', fontWeight: 700, lineHeight: 1.1,
             }}>
-              Pure spices.<br />
-              <em style={{ color: '#D4A853', fontStyle: 'italic' }}>Real</em> origin.<br />
-              No middlemen.
+              Crafted Blends of<br />
+              <em style={{ color: '#D4A82A', fontStyle: 'italic' }}>Pure Indian Spices</em><br />
+              &amp; Premium Nuts
             </h1>
-            <p className="hero-line-3 mb-10" style={{
-              color: 'rgba(253,246,238,0.6)', maxWidth: 400,
+            <p className="hero-line-3 mb-4" style={{
+              color: 'rgba(251,245,236,0.65)', maxWidth: 420,
               fontSize: '1rem', lineHeight: 1.8,
             }}>
-              Whole spices & nuts sourced directly from the forests and farms of the Western Ghats — unprocessed and unadulterated.
+              Discover the essence of authentic flavour in every bite.
+              Sourced directly from Indian farms — whole, unprocessed, unadulterated.
             </p>
+            <div className="hero-line-3 flex gap-3 mb-10" style={{ flexWrap: 'wrap' }}>
+              {['🌿 Organic', '⭐ Premium', '🏺 Artisanal'].map((t) => (
+                <span key={t} className="tag px-3 py-1.5"
+                  style={{ border: '1px solid rgba(212,168,42,0.35)', color: 'rgba(212,168,42,0.8)', borderRadius: 2, fontSize: '0.58rem' }}>
+                  {t}
+                </span>
+              ))}
+            </div>
             <div className="hero-line-4 flex flex-wrap gap-4">
-              <Link href="/products" className="btn-cinnamon">Shop Now →</Link>
+              <Link href="/products" className="btn-cinnamon">Shop Our Blends →</Link>
               <Link href="/story" className="btn-outline">Our Story</Link>
             </div>
           </div>
