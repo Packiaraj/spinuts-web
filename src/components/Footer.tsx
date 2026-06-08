@@ -14,9 +14,11 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6 py-16">
         <div className="grid md:grid-cols-4 gap-12 mb-12">
           {/* Brand */}
-          <div className="md:col-span-2 flex items-start gap-6">
-            {/* Logo */}
-            <Image src="/logo.png" alt="SpiNuts" width={180} height={180} style={{ objectFit: 'contain', flexShrink: 0 }} />
+          <div className="md:col-span-2 flex items-stretch gap-6">
+            {/* Logo — stretches to match content height */}
+            <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+              <Image src="/logo.png" alt="SpiNuts" width={220} height={220} style={{ objectFit: 'contain', width: 'auto', height: '100%', maxHeight: 220 }} />
+            </div>
             {/* Text */}
             <div className="pt-2">
               <p style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.6rem', fontWeight: 700, color: '#FDF6EE', marginBottom: 4 }}>SpiNuts</p>
