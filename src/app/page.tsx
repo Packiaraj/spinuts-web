@@ -189,7 +189,7 @@ export default function HomePage() {
 
       {/* ── HERO: banner image, 16:9 crop so button stays visible ── */}
       <section className="hero-line-1 relative w-full" style={{
-        aspectRatio: '16/8',
+        aspectRatio: '16/6',
         overflow: 'hidden',
         maxHeight: '90vh',
       }}>
