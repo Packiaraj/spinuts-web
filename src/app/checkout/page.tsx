@@ -34,8 +34,28 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('razorpay');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [shippingConfig, setShippingConfig] = useState({ tn_cost: 60, tn_free_above: 799, other_cost: 120 });
 
-  useEffect(() => { loadRazorpayScript(); }, []);
+  useEffect(() => {
+    loadRazorpayScript();
+    async function fetchShipping() {
+      try {
+        const { supabase } = await import('@/lib/supabase');
+        const { data } = await supabase.from('site_content')
+          .select('key, value')
+          .in('key', ['shipping_tn_cost', 'shipping_tn_free_above', 'shipping_other_cost']);
+        if (data) {
+          const map = Object.fromEntries(data.map((r: { key: string; value: string }) => [r.key, Number(r.value)]));
+          setShippingConfig({
+            tn_cost: map.shipping_tn_cost ?? 60,
+            tn_free_above: map.shipping_tn_free_above ?? 799,
+            other_cost: map.shipping_other_cost ?? 120,
+          });
+        }
+      } catch { /* use defaults */ }
+    }
+    fetchShipping();
+  }, []);
 
   function update(field: string, val: string) {
     setForm((f) => ({ ...f, [field]: val }));
@@ -48,7 +68,7 @@ export default function CheckoutPage() {
     const res = await fetch('/api/checkout/razorpay', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount: total, customer: form }),
+      body: JSON.stringify({ amount: grandTotal, customer: form }),
     });
     const data = await res.json();
 
@@ -109,7 +129,8 @@ export default function CheckoutPage() {
               customer_phone: form.phone,
               address: `${form.line1}${form.line2 ? ', ' + form.line2 : ''}, ${form.city}, ${form.state} - ${form.pincode}`,
               items: cart,
-              total,
+              total: grandTotal,
+              shipping_charge: shippingCharge,
               payment_method: 'razorpay',
               payment_id: response.razorpay_payment_id,
               status: 'confirmed',
@@ -144,7 +165,8 @@ export default function CheckoutPage() {
           customer_phone: form.phone,
           address: `${form.line1}${form.line2 ? ', ' + form.line2 : ''}, ${form.city}, ${form.state} - ${form.pincode}`,
           items: cart,
-          total,
+          total: grandTotal,
+          shipping_charge: shippingCharge,
           payment_method: 'cod',
           status: 'pending',
         }]);
@@ -158,6 +180,14 @@ export default function CheckoutPage() {
     if (paymentMethod === 'gpay') await handleRazorpay('gpay');
     if (paymentMethod === 'phonepe') await handleRazorpay('phonepe');
   }
+
+  // Shipping calculation
+  const isTamilNadu = form.state.trim().toLowerCase().replace(/\s+/g, '') === 'tamilnadu' ||
+    form.state.trim().toLowerCase() === 'tn';
+  const shippingCharge = isTamilNadu
+    ? (total >= shippingConfig.tn_free_above ? 0 : shippingConfig.tn_cost)
+    : (form.state ? shippingConfig.other_cost : 0);
+  const grandTotal = total + shippingCharge;
 
   const inp = "w-full text-sm py-2.5 px-3 bg-white";
   const inpS = { border: '0.5px solid rgba(0,0,0,0.15)' };
@@ -353,6 +383,7 @@ export default function CheckoutPage() {
         <div>
           <div className="p-6 bg-white sticky top-24" style={{ border: '0.5px solid rgba(0,0,0,0.1)' }}>
             <p className="label-tag mb-4" style={{ color: '#1B4332' }}>Order Summary</p>
+
             <div className="space-y-2 mb-4">
               {cart.map((item) => (
                 <div key={item.product.id} className="flex justify-between text-xs text-gray-600">
@@ -361,24 +392,49 @@ export default function CheckoutPage() {
                 </div>
               ))}
             </div>
-            <div className="flex justify-between font-medium pt-4 text-sm"
+
+            <div className="space-y-2 pt-3" style={{ borderTop: '0.5px solid rgba(0,0,0,0.08)' }}>
+              <div className="flex justify-between text-xs text-gray-500">
+                <span>Subtotal</span>
+                <span>₹{total.toFixed(0)}</span>
+              </div>
+              <div className="flex justify-between text-xs">
+                <span className="text-gray-500">Shipping</span>
+                {!form.state ? (
+                  <span className="text-gray-400">Enter state</span>
+                ) : shippingCharge === 0 ? (
+                  <span className="font-medium" style={{ color: '#059669' }}>🎉 Free</span>
+                ) : (
+                  <span className="text-gray-700">₹{shippingCharge}</span>
+                )}
+              </div>
+              {isTamilNadu && total < shippingConfig.tn_free_above && form.state && (
+                <p className="text-xs p-2 rounded" style={{ backgroundColor: 'rgba(27,67,50,0.06)', color: '#1B4332' }}>
+                  Add ₹{(shippingConfig.tn_free_above - total).toFixed(0)} more for free shipping!
+                </p>
+              )}
+              {isTamilNadu && shippingCharge === 0 && (
+                <p className="text-xs p-2 rounded" style={{ backgroundColor: 'rgba(5,150,105,0.08)', color: '#059669' }}>
+                  ✓ Free shipping applied within Tamil Nadu
+                </p>
+              )}
+            </div>
+
+            <div className="flex justify-between font-medium mt-3 pt-3 text-sm"
               style={{ borderTop: '0.5px solid rgba(0,0,0,0.08)' }}>
               <span>Total</span>
-              <span style={{ color: '#1B4332' }}>₹{total.toFixed(0)}</span>
+              <span style={{ color: '#1B4332' }}>₹{grandTotal.toFixed(0)}</span>
             </div>
-            <p className="text-xs text-gray-400 mt-2">Free delivery · No hidden charges</p>
 
             <button type="submit" disabled={loading}
-              className="w-full py-3.5 mt-6 label-tag transition-opacity hover:opacity-90 disabled:opacity-60 flex items-center justify-center gap-2"
+              className="w-full py-3.5 mt-5 label-tag transition-opacity hover:opacity-90 disabled:opacity-60 flex items-center justify-center gap-2"
               style={{ backgroundColor: '#1B4332', color: '#FFF8F0' }}>
               {loading
                 ? <><SpiceLoader size="sm" /> Processing...</>
-                : paymentMethod === 'cod' ? 'Place Order' : 'Pay ₹' + total.toFixed(0)}
+                : paymentMethod === 'cod' ? 'Place Order' : `Pay ₹${grandTotal.toFixed(0)}`}
             </button>
 
-            <p className="text-center text-xs text-gray-400 mt-3">
-              🔒 Secured by Razorpay
-            </p>
+            <p className="text-center text-xs text-gray-400 mt-3">🔒 Secured by Razorpay</p>
           </div>
         </div>
       </form>

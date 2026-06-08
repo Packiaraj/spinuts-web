@@ -22,6 +22,10 @@ interface SiteContent {
   trust_4_label: string;
   trust_4_sub: string;
   banner_tag: string;
+  // Shipping
+  shipping_tn_cost: string;
+  shipping_tn_free_above: string;
+  shipping_other_cost: string;
 }
 
 const DEFAULTS: SiteContent = {
@@ -43,6 +47,9 @@ const DEFAULTS: SiteContent = {
   trust_4_label: 'Pan India',
   trust_4_sub: 'Fast delivery',
   banner_tag: 'Gift Special',
+  shipping_tn_cost: '60',
+  shipping_tn_free_above: '799',
+  shipping_other_cost: '120',
 };
 
 export default function AdminContentPage() {
@@ -173,6 +180,76 @@ export default function AdminContentPage() {
               {field('banner_tag', 'Banner Tag (e.g. Diwali Special)')}
               {field('gift_title', 'Title')}
               {field('gift_subtitle', 'Subtitle')}
+            </div>
+          </section>
+
+          {/* Shipping */}
+          <section className="bg-white p-6" style={{ border: '0.5px solid rgba(0,0,0,0.08)' }}>
+            <p className="label-tag mb-1" style={{ color: '#1B4332' }}>Shipping Charges</p>
+            <p className="text-xs text-gray-400 mb-5">Customers are charged these rates at checkout based on their state.</p>
+
+            <div className="grid grid-cols-2 gap-6">
+              {/* Tamil Nadu */}
+              <div className="p-5 rounded-sm" style={{ border: '0.5px solid rgba(27,67,50,0.2)', backgroundColor: 'rgba(27,67,50,0.02)' }}>
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-lg">🏠</span>
+                  <div>
+                    <p className="text-sm font-medium">Tamil Nadu</p>
+                    <p className="text-xs text-gray-400">Local delivery</p>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div>
+                    <label className="label-tag text-gray-400 block mb-1">Shipping Cost (₹)</label>
+                    <input
+                      type="number" min={0}
+                      value={content.shipping_tn_cost}
+                      onChange={(e) => setContent((c) => ({ ...c, shipping_tn_cost: e.target.value }))}
+                      className="w-full text-sm py-2 px-3 bg-white"
+                      style={{ border: '0.5px solid rgba(0,0,0,0.15)' }}
+                    />
+                  </div>
+                  <div>
+                    <label className="label-tag text-gray-400 block mb-1">Free Shipping Above (₹)</label>
+                    <input
+                      type="number" min={0}
+                      value={content.shipping_tn_free_above}
+                      onChange={(e) => setContent((c) => ({ ...c, shipping_tn_free_above: e.target.value }))}
+                      className="w-full text-sm py-2 px-3 bg-white"
+                      style={{ border: '0.5px solid rgba(0,0,0,0.15)' }}
+                    />
+                    <p className="text-xs text-gray-400 mt-1">
+                      Orders above ₹{content.shipping_tn_free_above} get free shipping in Tamil Nadu
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Other States */}
+              <div className="p-5 rounded-sm" style={{ border: '0.5px solid rgba(212,160,23,0.3)', backgroundColor: 'rgba(212,160,23,0.02)' }}>
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-lg">🚚</span>
+                  <div>
+                    <p className="text-sm font-medium">Other States</p>
+                    <p className="text-xs text-gray-400">Pan India delivery</p>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div>
+                    <label className="label-tag text-gray-400 block mb-1">Shipping Cost (₹)</label>
+                    <input
+                      type="number" min={0}
+                      value={content.shipping_other_cost}
+                      onChange={(e) => setContent((c) => ({ ...c, shipping_other_cost: e.target.value }))}
+                      className="w-full text-sm py-2 px-3 bg-white"
+                      style={{ border: '0.5px solid rgba(0,0,0,0.15)' }}
+                    />
+                  </div>
+                  <div className="p-3 rounded-sm" style={{ backgroundColor: 'rgba(212,160,23,0.08)', border: '0.5px solid rgba(212,160,23,0.2)' }}>
+                    <p className="text-xs text-gray-500">Applied to all orders outside Tamil Nadu regardless of order value.</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
         </div>
