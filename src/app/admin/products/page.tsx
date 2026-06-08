@@ -1,9 +1,28 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import AdminNav from '@/components/AdminNav';
-import { Plus, Edit2, Trash2, X, Upload, ImageIcon } from 'lucide-react';
+import { Plus, Edit2, Trash2, X, Upload } from 'lucide-react';
 import { Product } from '@/lib/types';
-import Image from 'next/image';
+
+const CATEGORY_EMOJI: Record<string, string> = {
+  spices: '🌶️', nuts: '🥜', seeds: '🌱', millets: '🌾', 'dry-fruits': '🍇',
+};
+
+function ProductThumb({ images, category }: { images: string[]; category: string }) {
+  const [err, setErr] = useState(false);
+  const src = images?.[0];
+  if (src && !err) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src={src} alt="" className="w-full h-full object-cover" onError={() => setErr(true)} />
+    );
+  }
+  return (
+    <div className="w-full h-full flex items-center justify-center text-xl">
+      {CATEGORY_EMOJI[category] || '🌿'}
+    </div>
+  );
+}
 
 const EMPTY: Partial<Product> = {
   name: '', description: '', price_inr: 0, price_usd: 0,
@@ -111,11 +130,8 @@ export default function AdminProductsPage() {
                 <tr key={p.id} style={{ borderBottom: '0.5px solid rgba(0,0,0,0.04)' }}
                   className="hover:bg-gray-50 transition-colors">
                   <td className="px-4 py-3">
-                    <div className="w-12 h-12 relative rounded overflow-hidden" style={{ backgroundColor: '#f5f0eb' }}>
-                      {p.images?.[0]
-                        ? <Image src={p.images[0]} alt={p.name} fill className="object-cover" />
-                        : <div className="w-full h-full flex items-center justify-center"><ImageIcon size={16} className="text-gray-300" /></div>
-                      }
+                    <div className="w-12 h-12 overflow-hidden rounded" style={{ backgroundColor: '#f5f0eb' }}>
+                      <ProductThumb images={p.images || []} category={p.category} />
                     </div>
                   </td>
                   <td className="px-4 py-3">
@@ -169,7 +185,8 @@ export default function AdminProductsPage() {
                 <div className="flex flex-wrap gap-3 mb-3">
                   {(editing.images || []).map((url) => (
                     <div key={url} className="relative w-24 h-24 rounded overflow-hidden group" style={{ border: '0.5px solid rgba(0,0,0,0.1)' }}>
-                      <Image src={url} alt="product" fill className="object-cover" />
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={url} alt="product" className="w-full h-full object-cover" />
                       <button
                         onClick={() => removeImage(url)}
                         className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
