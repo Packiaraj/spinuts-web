@@ -3,11 +3,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/lib/store';
 import { SpiceLoader } from '@/components/SpiceLoader';
-import { QRCodeSVG } from 'qrcode.react';
-
-const UPI_ID = '9842123958@postbank';
-const UPI_NAME = 'SHANTHI VELLAICHAMY';
-
 type PaymentMethod = 'razorpay' | 'gpay' | 'phonepe' | 'cod';
 
 function loadRazorpayScript(): Promise<boolean> {
@@ -310,31 +305,16 @@ export default function CheckoutPage() {
               </label>
             </div>
 
-            {/* QR Code Panel — shown when GPay/PhonePe/QR selected */}
+            {/* Info pill when GPay/PhonePe selected */}
             {(paymentMethod === 'gpay' || paymentMethod === 'phonepe') && (
-              <div className="mb-4 p-5 flex flex-col items-center gap-3 animate-fadeIn"
-                style={{ border: '0.5px solid rgba(0,0,0,0.1)', backgroundColor: '#fafafa' }}>
-                <p className="label-tag text-gray-500">
-                  Scan with {paymentMethod === 'gpay' ? 'Google Pay' : 'PhonePe'} to pay ₹{total.toFixed(0)}
-                </p>
-                <div className="p-3 bg-white rounded" style={{ border: '0.5px solid rgba(0,0,0,0.08)' }}>
-                  <QRCodeSVG
-                    value={`upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(UPI_NAME)}&am=${total.toFixed(0)}&cu=INR&tn=${encodeURIComponent('SpiNuts Order')}`}
-                    size={160}
-                    fgColor="#1B4332"
-                    bgColor="#ffffff"
-                    level="M"
-                  />
-                </div>
-                <div className="text-center">
-                  <p className="text-xs text-gray-500">UPI ID</p>
-                  <p className="text-sm font-medium mt-0.5" style={{ color: '#1B4332' }}>{UPI_ID}</p>
-                  <p className="text-xs text-gray-400">{UPI_NAME}</p>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-gray-400">
-                  <span>🔒</span>
-                  <span>Open your UPI app → Scan QR → Pay ₹{total.toFixed(0)}</span>
-                </div>
+              <div className="mb-4 px-4 py-3 flex items-center gap-3 text-xs text-gray-500"
+                style={{ border: '0.5px solid rgba(0,0,0,0.08)', backgroundColor: '#f9f9f9' }}>
+                <span className="text-base">{paymentMethod === 'gpay' ? '🟢' : '🟣'}</span>
+                <span>
+                  Click <strong>Pay ₹{grandTotal.toFixed(0)}</strong> — Razorpay will open{' '}
+                  {paymentMethod === 'gpay' ? 'Google Pay' : 'PhonePe'} directly for instant UPI payment.
+                  Your order is confirmed automatically once payment succeeds.
+                </span>
               </div>
             )}
 
