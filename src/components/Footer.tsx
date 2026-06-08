@@ -15,12 +15,10 @@ export default function Footer() {
         <div className="grid md:grid-cols-4 gap-12 mb-12">
           {/* Brand */}
           <div className="md:col-span-2">
-            <div className="flex items-center gap-3 mb-5">
-              <Image src="/logo.png" alt="SpiNuts" width={60} height={60} style={{ objectFit: 'contain' }} />
-              <div>
-                <p style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.2rem', fontWeight: 700, color: '#FDF6EE' }}>SpiNuts</p>
-                <p className="tag" style={{ color: '#B8860B', fontSize: '0.52rem', marginTop: 2 }}>Pure Indian Spices · Est. 2024</p>
-              </div>
+            <div className="flex flex-col items-start mb-6">
+              <Image src="/logo.png" alt="SpiNuts" width={140} height={140} style={{ objectFit: 'contain' }} />
+              <p style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.5rem', fontWeight: 700, color: '#FDF6EE', marginTop: 8 }}>SpiNuts</p>
+              <p className="tag" style={{ color: '#B8860B', fontSize: '0.6rem', marginTop: 4, letterSpacing: '0.15em' }}>Pure Indian Spices · Est. 2024</p>
             </div>
             <p style={{ color: 'rgba(253,246,238,0.5)', fontSize: '0.88rem', lineHeight: 1.8, maxWidth: 280 }}>
               Crafted blends of pure Indian spices &amp; premium nuts. Organic, artisanal, and delivered straight from Indian farms to your kitchen.
