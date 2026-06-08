@@ -1,45 +1,44 @@
 'use client';
 import Link from 'next/link';
-import { ShoppingBag, Search } from 'lucide-react';
+import { ShoppingBag } from 'lucide-react';
 import { useStore } from '@/lib/store';
 
 export default function Nav() {
   const cartCount = useStore((s) => s.cartCount());
 
   return (
-    <nav className="bg-white sticky top-0 z-50" style={{ borderBottom: '0.5px solid rgba(0,0,0,0.12)' }}>
+    <nav className="sticky top-0 z-50" style={{ backgroundColor: '#FAFAF8', borderBottom: '1px solid #E8E5DF' }}>
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <span className="text-xl font-500" style={{ color: '#1B4332', fontWeight: 500, letterSpacing: '0.05em' }}>
-            SPINUTS
+        <Link href="/" className="flex flex-col leading-none">
+          <span style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.15rem', color: '#1A1A1A', letterSpacing: '0.04em' }}>
+            SpiNuts
           </span>
-          <span className="label-tag" style={{ color: '#D4A017' }}>by Amigoz</span>
+          <span className="label-tag" style={{ color: '#B8860B', letterSpacing: '0.18em', marginTop: 1 }}>Western Ghats</span>
         </Link>
 
         {/* Center links */}
-        <div className="hidden md:flex items-center gap-8">
-          {['Shop', 'Our Story', 'Origin'].map((label) => (
-            <Link
-              key={label}
-              href={label === 'Shop' ? '/products' : label === 'Our Story' ? '/story' : '/origin'}
-              className="label-tag text-gray-600 hover:text-[#1B4332] transition-colors"
+        <div className="hidden md:flex items-center gap-10">
+          {[['Shop', '/products'], ['Our Story', '/story']].map(([label, href]) => (
+            <Link key={label} href={href}
+              className="label-tag transition-colors"
+              style={{ color: '#555550', letterSpacing: '0.12em' }}
+              onMouseEnter={e => (e.currentTarget.style.color = '#1A1A1A')}
+              onMouseLeave={e => (e.currentTarget.style.color = '#555550')}
             >
               {label}
             </Link>
           ))}
         </div>
 
-        {/* Right actions */}
+        {/* Right */}
         <div className="flex items-center gap-5">
-          <button className="text-gray-600 hover:text-[#1B4332] transition-colors">
-            <Search size={18} />
-          </button>
-          <Link href="/cart" className="relative text-gray-600 hover:text-[#1B4332] transition-colors">
-            <ShoppingBag size={18} />
+          <Link href="/cart" className="relative transition-opacity hover:opacity-70" style={{ color: '#1A1A1A' }}>
+            <ShoppingBag size={19} strokeWidth={1.5} />
             {cartCount > 0 && (
-              <span className="absolute -top-2 -right-2 w-4 h-4 rounded-full text-white flex items-center justify-center text-[10px]"
-                style={{ backgroundColor: '#1B4332' }}>
+              <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full text-white flex items-center justify-center text-[9px] font-semibold"
+                style={{ backgroundColor: '#B8860B' }}>
                 {cartCount}
               </span>
             )}
