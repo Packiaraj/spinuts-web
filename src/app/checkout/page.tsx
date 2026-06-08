@@ -426,7 +426,7 @@ export default function CheckoutPage() {
               className="w-full py-3.5 mt-5 label-tag transition-opacity hover:opacity-90 disabled:opacity-60 flex items-center justify-center gap-2"
               style={{ backgroundColor: '#1B4332', color: '#FFF8F0' }}>
               {loading
-                ? <><SpiceLoader size="sm" /> Processing...</>
+                ? <><SpiceLoader /> Processing...</>
                 : paymentMethod === 'cod' ? 'Place Order' : `Pay ₹${grandTotal.toFixed(0)}`}
             </button>
 

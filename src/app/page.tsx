@@ -1,72 +1,181 @@
 'use client';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import ProductCard from '@/components/ProductCard';
 import { PageLoader } from '@/components/SpiceLoader';
 import { Product, Category } from '@/lib/types';
 
-const CATEGORIES: { id: Category; label: string }[] = [
-  { id: 'all', label: 'All' },
-  { id: 'spices', label: 'Spices' },
-  { id: 'nuts', label: 'Nuts' },
-  { id: 'seeds', label: 'Seeds' },
-  { id: 'millets', label: 'Millets' },
-  { id: 'dry-fruits', label: 'Dry Fruits' },
+const CATEGORIES: { id: Category; label: string; emoji: string }[] = [
+  { id: 'all', label: 'All', emoji: '✦' },
+  { id: 'spices', label: 'Spices', emoji: '🌶️' },
+  { id: 'nuts', label: 'Nuts', emoji: '🥜' },
+  { id: 'seeds', label: 'Seeds', emoji: '🌱' },
+  { id: 'millets', label: 'Millets', emoji: '🌾' },
+  { id: 'dry-fruits', label: 'Dry Fruits', emoji: '🍇' },
 ];
 
-const TRUST_ICONS = ['⟡', '◈', '✦', '◎'];
+const TRUST = [
+  { icon: '🌿', label: 'Farm Direct', sub: 'No middlemen, ever' },
+  { icon: '🏔️', label: 'Western Ghats', sub: 'Biodiversity hotspot' },
+  { icon: '✦', label: 'Whole & Pure', sub: 'Unprocessed, natural' },
+  { icon: '🚚', label: 'Pan India', sub: 'Fast, careful delivery' },
+];
 
-interface SiteContent {
-  hero_headline: string;
-  hero_subtext: string;
-  hero_cta: string;
-  story_headline: string;
-  story_body1: string;
-  story_body2: string;
-  gift_title: string;
-  gift_subtitle: string;
-  trust_1_label: string; trust_1_sub: string;
-  trust_2_label: string; trust_2_sub: string;
-  trust_3_label: string; trust_3_sub: string;
-  trust_4_label: string; trust_4_sub: string;
-  banner_tag: string;
+function useReveal(threshold = 0.15) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { el.classList.add('visible'); obs.disconnect(); } },
+      { threshold }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [threshold]);
+  return ref;
 }
 
-const DEFAULT_CONTENT: SiteContent = {
-  hero_headline: 'Pure spices.\nReal origin.\nNo middlemen.',
-  hero_subtext: 'Whole spices and nuts sourced directly from the forests and farms of the Western Ghats. Unprocessed, unadulterated, and delivered to your door.',
-  hero_cta: 'Shop All Products',
-  story_headline: "From the heart of\nthe Western Ghats.",
-  story_body1: "SpiNuts began with a simple belief: the best spices are whole spices, freshly sourced. We work directly with farmers and forest communities deep in the Western Ghats — one of the world's richest biodiversity hotspots — cutting out every layer of middlemen so you get the real thing.",
-  story_body2: "Every batch is traceable to its source. Every product is packed within days of harvest. That's the SpiNuts promise.",
-  gift_title: 'Gift boxes available',
-  gift_subtitle: 'Curated spice and nut collections from the Western Ghats, beautifully packed.',
-  trust_1_label: 'Farm Direct', trust_1_sub: 'No middlemen',
-  trust_2_label: 'Western Ghats', trust_2_sub: 'Biodiversity hotspot',
-  trust_3_label: 'Whole & Pure', trust_3_sub: 'Unprocessed, natural',
-  trust_4_label: 'Pan India', trust_4_sub: 'Fast delivery',
-  banner_tag: 'Gift Special',
-};
+/* ── Sub-components that safely call hooks ── */
 
+function TrustBar() {
+  const ref = useReveal(0.1);
+  return (
+    <section style={{ backgroundColor: '#FFFFFF', borderBottom: '1px solid #E8D9C8', borderTop: '1px solid #E8D9C8' }}>
+      <div ref={ref} className="reveal max-w-7xl mx-auto px-6 py-5 grid grid-cols-2 md:grid-cols-4">
+        {TRUST.map((t, i) => (
+          <div key={i} className="flex items-center gap-3 px-5 py-3"
+            style={{ borderRight: i < 3 ? '1px solid #E8D9C8' : 'none' }}>
+            <span style={{ fontSize: '1.3rem' }}>{t.icon}</span>
+            <div>
+              <p className="tag" style={{ color: '#2C1A0E', fontSize: '0.6rem' }}>{t.label}</p>
+              <p style={{ fontSize: '0.75rem', color: '#8B6F5E', marginTop: 2 }}>{t.sub}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function StorySection() {
+  const leftRef = useReveal(0.1);
+  const rightRef = useReveal(0.1);
+  return (
+    <section style={{ backgroundColor: '#2C1A0E' }} className="py-28 px-6 overflow-hidden">
+      <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-20 items-center">
+        <div ref={leftRef} className="reveal-left aspect-[4/5] overflow-hidden relative">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800&q=80"
+            alt="Western Ghats spices"
+            className="w-full h-full object-cover"
+            style={{ filter: 'brightness(0.85) saturate(1.1)' }}
+          />
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'linear-gradient(135deg, rgba(196,120,58,0.15) 0%, transparent 60%)',
+          }} />
+          <div style={{
+            position: 'absolute', bottom: 0, left: 0, right: 0,
+            padding: '24px', background: 'linear-gradient(to top, rgba(44,26,14,0.8), transparent)',
+          }}>
+            <p className="tag" style={{ color: 'rgba(212,168,83,0.9)', letterSpacing: '0.18em' }}>
+              Western Ghats · Forest Farms
+            </p>
+          </div>
+        </div>
+
+        <div ref={rightRef} className="reveal-right">
+          <p className="tag mb-5" style={{ color: '#C4783A', letterSpacing: '0.18em' }}>Our Story</p>
+          <h2 style={{
+            fontFamily: "'Playfair Display', serif",
+            fontSize: 'clamp(2rem, 3.5vw, 3rem)',
+            color: '#FDF6EE', marginBottom: 24,
+          }}>
+            From the heart of<br />
+            <em style={{ color: '#D4A853' }}>the Western Ghats.</em>
+          </h2>
+          <p style={{ color: 'rgba(253,246,238,0.6)', lineHeight: 1.85, marginBottom: 18, fontSize: '0.95rem' }}>
+            SpiNuts began with a simple belief: the best spices are whole spices, freshly sourced. We work directly with farmers and forest communities deep in the Western Ghats — one of the world's richest biodiversity hotspots.
+          </p>
+          <p style={{ color: 'rgba(253,246,238,0.6)', lineHeight: 1.85, marginBottom: 36, fontSize: '0.95rem' }}>
+            Every batch is traceable to its source. Every product is packed within days of harvest. That's the SpiNuts promise.
+          </p>
+          <Link href="/story"
+            className="inline-flex items-center gap-2 text-sm font-semibold transition-all hover:gap-4"
+            style={{ color: '#C4783A', borderBottom: '1px solid rgba(196,120,58,0.4)', paddingBottom: 4 }}>
+            Read our full story →
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function GiftSection() {
+  const ref = useReveal(0.1);
+  return (
+    <section style={{ backgroundColor: '#FDF6EE' }} className="py-20 px-6">
+      <div ref={ref} className="reveal max-w-7xl mx-auto">
+        <div className="grid md:grid-cols-2 overflow-hidden"
+          style={{ border: '1px solid #E8D9C8', borderRadius: 4 }}>
+          <div className="p-12" style={{ backgroundColor: '#2C1A0E' }}>
+            <span className="tag px-3 py-1.5 mb-6 inline-block"
+              style={{ backgroundColor: '#C4783A', color: '#fff', borderRadius: 2 }}>
+              Gift Special
+            </span>
+            <h3 style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: '2rem', color: '#FDF6EE', marginBottom: 16,
+            }}>
+              Gift boxes available
+            </h3>
+            <p style={{ color: 'rgba(253,246,238,0.6)', lineHeight: 1.8, marginBottom: 32, fontSize: '0.9rem' }}>
+              Curated spice & nut collections from the Western Ghats, beautifully packed — perfect for every occasion.
+            </p>
+            <Link href="/products" className="btn-cinnamon">
+              Shop Gift Boxes →
+            </Link>
+          </div>
+          <div className="p-12 flex flex-col justify-center gap-0" style={{ backgroundColor: '#FFFFFF' }}>
+            {[
+              { icon: '🌶️', title: 'The Spice Lover', desc: 'Whole pepper, cardamom, cloves & more.' },
+              { icon: '🥜', title: 'The Nut Collection', desc: 'Premium cashews, almonds, pistachios.' },
+              { icon: '🌿', title: 'The Forest Harvest', desc: 'Rare finds from deep in the Ghats.' },
+            ].map((g) => (
+              <div key={g.title} className="flex items-start gap-4 py-5"
+                style={{ borderBottom: '1px solid #E8D9C8' }}>
+                <span style={{ fontSize: '1.8rem' }}>{g.icon}</span>
+                <div>
+                  <p className="tag mb-1" style={{ color: '#2C1A0E' }}>{g.title}</p>
+                  <p style={{ fontSize: '0.82rem', color: '#8B6F5E' }}>{g.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── Main page ── */
 export default function HomePage() {
   const [activeCategory, setActiveCategory] = useState<Category>('all');
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [content, setContent] = useState<SiteContent>(DEFAULT_CONTENT);
+
+  const productsRef = useReveal(0.05);
 
   useEffect(() => {
     async function fetchAll() {
       try {
         const { supabase } = await import('@/lib/supabase');
-        const [prodRes, contentRes] = await Promise.all([
-          supabase.from('products').select('*').eq('active', true).order('created_at', { ascending: false }),
-          supabase.from('site_content').select('key, value'),
-        ]);
-        if (prodRes.data) setProducts(prodRes.data);
-        if (contentRes.data?.length) {
-          const map = Object.fromEntries(contentRes.data.map((r: { key: string; value: string }) => [r.key, r.value]));
-          setContent((prev) => ({ ...prev, ...map }));
-        }
+        const { data } = await supabase
+          .from('products').select('*').eq('active', true)
+          .order('created_at', { ascending: false });
+        if (data) setProducts(data);
       } catch (e) { console.error(e); }
       finally { setLoading(false); }
     }
@@ -74,164 +183,174 @@ export default function HomePage() {
   }, []);
 
   const filtered = activeCategory === 'all' ? products : products.filter((p) => p.category === activeCategory);
-  const trustItems = [
-    { label: content.trust_1_label, sub: content.trust_1_sub },
-    { label: content.trust_2_label, sub: content.trust_2_sub },
-    { label: content.trust_3_label, sub: content.trust_3_sub },
-    { label: content.trust_4_label, sub: content.trust_4_sub },
-  ];
 
   return (
-    <div style={{ backgroundColor: '#FAFAF8' }}>
+    <div style={{ backgroundColor: '#FDF6EE' }}>
 
-      {/* ── Hero ── */}
-      <section style={{ backgroundColor: '#111110', color: '#F5F3EE' }} className="relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6 py-32 md:py-40 grid md:grid-cols-2 gap-16 items-center">
+      {/* ── HERO ── */}
+      <section style={{ backgroundColor: '#2C1A0E', minHeight: '92vh', position: 'relative', overflow: 'hidden' }}
+        className="flex items-center">
+        {/* Dot texture */}
+        <div style={{
+          position: 'absolute', inset: 0, opacity: 0.04,
+          backgroundImage: 'radial-gradient(circle, #FDF6EE 1px, transparent 1px)',
+          backgroundSize: '32px 32px',
+        }} />
+        {/* Warm glow */}
+        <div style={{
+          position: 'absolute', top: '15%', right: '8%',
+          width: 520, height: 520,
+          background: 'radial-gradient(circle, rgba(196,120,58,0.2) 0%, transparent 70%)',
+          borderRadius: '50%', pointerEvents: 'none',
+        }} />
+
+        <div className="max-w-7xl mx-auto px-6 py-20 w-full grid md:grid-cols-2 gap-16 items-center">
+          {/* Text */}
           <div>
-            <p className="label-tag mb-6" style={{ color: '#B8860B', letterSpacing: '0.2em' }}>
+            <p className="hero-line-1 tag mb-6" style={{ color: '#C4783A', letterSpacing: '0.2em' }}>
               Western Ghats · Forest to Table
             </p>
-            <h1 className="text-5xl md:text-7xl mb-8 leading-tight" style={{ fontFamily: "'Playfair Display',serif", fontWeight: 400, whiteSpace: 'pre-line', color: '#F5F3EE' }}>
-              {content.hero_headline}
+            <h1 className="hero-line-2 mb-7" style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: 'clamp(2.8rem, 6vw, 5rem)',
+              color: '#FDF6EE', fontWeight: 700, lineHeight: 1.08,
+            }}>
+              Pure spices.<br />
+              <em style={{ color: '#D4A853', fontStyle: 'italic' }}>Real</em> origin.<br />
+              No middlemen.
             </h1>
-            <p className="text-base mb-10 leading-relaxed" style={{ color: 'rgba(245,243,238,0.6)', maxWidth: 400 }}>
-              {content.hero_subtext}
+            <p className="hero-line-3 mb-10" style={{
+              color: 'rgba(253,246,238,0.6)', maxWidth: 400,
+              fontSize: '1rem', lineHeight: 1.8,
+            }}>
+              Whole spices & nuts sourced directly from the forests and farms of the Western Ghats — unprocessed and unadulterated.
             </p>
-            <Link href="/products"
-              className="inline-flex items-center gap-3 px-8 py-4 label-tag transition-all hover:gap-5"
-              style={{ backgroundColor: '#B8860B', color: '#111110', letterSpacing: '0.14em' }}>
-              {content.hero_cta} <span>→</span>
-            </Link>
+            <div className="hero-line-4 flex flex-wrap gap-4">
+              <Link href="/products" className="btn-cinnamon">Shop Now →</Link>
+              <Link href="/story" className="btn-outline">Our Story</Link>
+            </div>
           </div>
-          {/* Decorative right side */}
-          <div className="hidden md:flex items-center justify-center">
-            <div className="relative w-80 h-80">
-              <div className="absolute inset-0 rounded-full opacity-10" style={{ background: 'radial-gradient(circle, #B8860B, transparent)' }} />
-              <div className="absolute inset-8 rounded-full flex items-center justify-center" style={{ border: '1px solid rgba(184,134,11,0.2)' }}>
-                <div className="text-center">
-                  <p className="text-7xl mb-3">🌶️</p>
-                  <p className="label-tag" style={{ color: 'rgba(184,134,11,0.6)', letterSpacing: '0.2em' }}>Pure · Whole · Real</p>
+
+          {/* Decorative */}
+          <div className="hidden md:flex items-center justify-center hero-line-2">
+            <div style={{ position: 'relative', width: 340, height: 380 }}>
+              <div style={{
+                width: 270, height: 270, borderRadius: '50%',
+                border: '1px solid rgba(196,120,58,0.25)',
+                position: 'absolute', top: '50%', left: '50%',
+                transform: 'translate(-50%,-50%)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                backgroundColor: 'rgba(196,120,58,0.05)',
+              }}>
+                <div style={{ textAlign: 'center' }}>
+                  <p style={{ fontSize: '5rem', lineHeight: 1 }}>🌶️</p>
+                  <p className="tag mt-3" style={{ color: 'rgba(212,168,83,0.7)', letterSpacing: '0.2em', fontSize: '0.55rem' }}>
+                    Pure · Whole · Real
+                  </p>
                 </div>
               </div>
-              <div className="absolute inset-0 rounded-full" style={{ border: '1px solid rgba(184,134,11,0.1)' }} />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Trust bar ── */}
-      <section style={{ backgroundColor: '#FFFFFF', borderBottom: '1px solid #E8E5DF', borderTop: '1px solid #E8E5DF' }}>
-        <div className="max-w-7xl mx-auto px-6 py-6 grid grid-cols-2 md:grid-cols-4 gap-0">
-          {trustItems.map((s, i) => (
-            <div key={i} className="flex items-center gap-3 px-6 py-2" style={{ borderRight: i < 3 ? '1px solid #E8E5DF' : 'none' }}>
-              <span style={{ color: '#B8860B', fontSize: '1rem' }}>{TRUST_ICONS[i]}</span>
-              <div>
-                <p className="label-tag" style={{ color: '#1A1A1A', fontSize: '0.6rem' }}>{s.label}</p>
-                <p className="text-xs mt-0.5" style={{ color: '#999990' }}>{s.sub}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── Products ── */}
-      <section className="py-20 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-end justify-between mb-10">
-            <div>
-              <p className="label-tag mb-2" style={{ color: '#B8860B' }}>Our Collection</p>
-              <h2 className="text-3xl" style={{ fontFamily: "'Playfair Display',serif", fontWeight: 400 }}>Sourced with care</h2>
-            </div>
-            <Link href="/products" className="label-tag transition-opacity hover:opacity-60" style={{ color: '#1A1A1A' }}>
-              View all →
-            </Link>
-          </div>
-
-          {/* Category pills */}
-          <div className="flex gap-2 mb-10 flex-wrap">
-            {CATEGORIES.map((cat) => (
-              <button key={cat.id} onClick={() => setActiveCategory(cat.id)}
-                className="label-tag px-4 py-2 transition-all"
-                style={activeCategory === cat.id
-                  ? { backgroundColor: '#1A1A1A', color: '#F5F3EE', border: '1px solid #1A1A1A' }
-                  : { backgroundColor: 'transparent', color: '#555550', border: '1px solid #E8E5DF' }}>
-                {cat.label}
-              </button>
-            ))}
-          </div>
-
-          {loading ? <PageLoader /> : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-              {filtered.map((product) => <ProductCard key={product.id} product={product} />)}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* ── Story ── */}
-      <section style={{ backgroundColor: '#111110', color: '#F5F3EE' }} className="py-24 px-6">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-20 items-center">
-          <div className="aspect-square overflow-hidden relative" style={{ border: '1px solid rgba(245,243,238,0.08)' }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800&q=80"
-              alt="Spices from the Western Ghats" className="w-full h-full object-cover opacity-80" />
-            <div className="absolute bottom-0 left-0 right-0 px-6 py-5"
-              style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.7), transparent)' }}>
-              <p className="label-tag" style={{ color: 'rgba(184,134,11,0.8)', letterSpacing: '0.18em' }}>Western Ghats · Forest to Table</p>
-            </div>
-          </div>
-          <div>
-            <p className="label-tag mb-5" style={{ color: '#B8860B', letterSpacing: '0.18em' }}>Our Story</p>
-            <h2 className="text-4xl mb-8 leading-snug" style={{ fontFamily: "'Playfair Display',serif", fontWeight: 400, whiteSpace: 'pre-line', color: '#F5F3EE' }}>
-              {content.story_headline}
-            </h2>
-            <p className="text-sm mb-5 leading-loose" style={{ color: 'rgba(245,243,238,0.6)' }}>{content.story_body1}</p>
-            <p className="text-sm mb-10 leading-loose" style={{ color: 'rgba(245,243,238,0.6)' }}>{content.story_body2}</p>
-            <Link href="/story" className="label-tag transition-opacity hover:opacity-60"
-              style={{ color: '#B8860B', borderBottom: '1px solid rgba(184,134,11,0.4)', paddingBottom: 3 }}>
-              Read our full story →
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Gift CTA ── */}
-      <section style={{ backgroundColor: '#FFFFFF', borderTop: '1px solid #E8E5DF' }} className="py-20 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-0 overflow-hidden" style={{ border: '1px solid #E8E5DF' }}>
-            <div className="p-12" style={{ backgroundColor: '#F4F1EB' }}>
-              <span className="label-tag px-3 py-1.5 mb-6 inline-block"
-                style={{ backgroundColor: '#B8860B', color: '#FFFFFF', letterSpacing: '0.16em' }}>
-                {content.banner_tag}
-              </span>
-              <h3 className="text-3xl mb-4" style={{ fontFamily: "'Playfair Display',serif", fontWeight: 400 }}>
-                {content.gift_title}
-              </h3>
-              <p className="text-sm mb-8" style={{ color: '#555550', lineHeight: 1.8 }}>{content.gift_subtitle}</p>
-              <Link href="/products"
-                className="inline-flex items-center gap-3 label-tag px-7 py-3.5 transition-all hover:gap-5"
-                style={{ backgroundColor: '#1A1A1A', color: '#F5F3EE', letterSpacing: '0.14em' }}>
-                Shop Gift Boxes →
-              </Link>
-            </div>
-            <div className="p-12 flex flex-col justify-between" style={{ backgroundColor: '#FFFFFF' }}>
+              <div style={{
+                width: 340, height: 340, borderRadius: '50%',
+                border: '1px dashed rgba(196,120,58,0.12)',
+                position: 'absolute', top: '50%', left: '50%',
+                transform: 'translate(-50%,-50%)',
+              }} />
               {[
-                { icon: '🌶️', title: 'The Spice Lover', desc: 'Whole pepper, cardamom, cloves and more.' },
-                { icon: '🥜', title: 'The Nut Collection', desc: 'Premium cashews, almonds, pistachios.' },
-                { icon: '🌿', title: 'The Forest Harvest', desc: 'Rare finds from deep in the Ghats.' },
-              ].map((g) => (
-                <div key={g.title} className="flex items-start gap-4 py-4" style={{ borderBottom: '1px solid #E8E5DF' }}>
-                  <span className="text-2xl">{g.icon}</span>
-                  <div>
-                    <p className="label-tag mb-1" style={{ color: '#1A1A1A' }}>{g.title}</p>
-                    <p className="text-xs" style={{ color: '#999990' }}>{g.desc}</p>
-                  </div>
+                { emoji: '🥜', label: 'Nuts', top: '4%', left: '62%' },
+                { emoji: '🌿', label: 'Herbs', top: '74%', left: '68%' },
+                { emoji: '🌾', label: 'Millets', top: '76%', left: '4%' },
+              ].map((b) => (
+                <div key={b.label} style={{
+                  position: 'absolute', top: b.top, left: b.left,
+                  backgroundColor: 'rgba(44,26,14,0.9)',
+                  border: '1px solid rgba(196,120,58,0.3)',
+                  borderRadius: 8, padding: '8px 12px',
+                  display: 'flex', alignItems: 'center', gap: 6,
+                }}>
+                  <span style={{ fontSize: '1.1rem' }}>{b.emoji}</span>
+                  <span className="tag" style={{ color: '#FDF6EE', fontSize: '0.55rem' }}>{b.label}</span>
                 </div>
               ))}
             </div>
           </div>
         </div>
+
+        {/* Scroll hint */}
+        <div style={{
+          position: 'absolute', bottom: 28, left: '50%', transform: 'translateX(-50%)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+        }} className="hero-line-4">
+          <p className="tag" style={{ color: 'rgba(253,246,238,0.3)', fontSize: '0.52rem' }}>Scroll</p>
+          <div style={{ width: 1, height: 36, background: 'linear-gradient(to bottom, rgba(196,120,58,0.5), transparent)' }} />
+        </div>
       </section>
+
+      {/* ── TRUST ── */}
+      <TrustBar />
+
+      {/* ── PRODUCTS ── */}
+      <section className="py-24 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div ref={productsRef} className="reveal">
+            <div className="flex items-end justify-between mb-10">
+              <div>
+                <p className="tag mb-2" style={{ color: '#C4783A' }}>Our Collection</p>
+                <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: 'clamp(1.8rem,3vw,2.5rem)', color: '#2C1A0E' }}>
+                  Sourced with care
+                </h2>
+              </div>
+              <Link href="/products" className="text-sm font-medium"
+                style={{ color: '#C4783A', textDecoration: 'underline', textUnderlineOffset: 4 }}>
+                View all →
+              </Link>
+            </div>
+
+            {/* Category pills */}
+            <div className="flex gap-2 mb-10 flex-wrap">
+              {CATEGORIES.map((cat) => (
+                <button key={cat.id} onClick={() => setActiveCategory(cat.id)}
+                  className="text-sm font-medium px-4 py-2 transition-all duration-200"
+                  style={activeCategory === cat.id
+                    ? { backgroundColor: '#2C1A0E', color: '#FDF6EE', border: '1.5px solid #2C1A0E', borderRadius: 2 }
+                    : { backgroundColor: 'transparent', color: '#8B6F5E', border: '1.5px solid #E8D9C8', borderRadius: 2 }
+                  }>
+                  {cat.emoji} {cat.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {loading ? <PageLoader /> : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+              {filtered.map((product, i) => (
+                <div key={product.id} className="reveal" style={{
+                  opacity: 0, transform: 'translateY(24px)',
+                  transition: `opacity 0.5s ease ${(i % 8) * 0.07}s, transform 0.5s ease ${(i % 8) * 0.07}s`,
+                }}
+                  ref={(el) => {
+                    if (!el) return;
+                    const obs = new IntersectionObserver(([entry]) => {
+                      if (entry.isIntersecting) {
+                        el.style.opacity = '1';
+                        el.style.transform = 'translateY(0)';
+                        obs.disconnect();
+                      }
+                    }, { threshold: 0.1 });
+                    obs.observe(el);
+                  }}>
+                  <ProductCard product={product} />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ── STORY ── */}
+      <StorySection />
+
+      {/* ── GIFT ── */}
+      <GiftSection />
 
     </div>
   );
