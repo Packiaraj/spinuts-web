@@ -208,8 +208,9 @@ export default function HomePage() {
               height: '9%',
               borderRadius: 8,
               cursor: 'pointer',
-              /* Debug: uncomment to see overlay */
-              /* backgroundColor: 'rgba(255,0,0,0.4)', */
+              zIndex: 10,
+              /* Debug: remove after fixing */
+              backgroundColor: 'rgba(255,0,0,0.4)',
             }}
           />
         </div>
