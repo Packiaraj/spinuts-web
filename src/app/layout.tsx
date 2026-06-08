@@ -5,8 +5,8 @@ import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: "SpiNuts — Pure spices. Real origin. No middlemen.",
-  description: "Family sourced whole spices and nuts directly from Kerala and Tamil Nadu farms. Premium quality, delivered to your door.",
-  keywords: "Kerala spices, whole spices, nuts, seeds, millets, dry fruits, India",
+  description: "Whole spices and nuts sourced directly from real farmers of the Western Ghats. Premium quality, delivered to your door.",
+  keywords: "Western Ghats spices, whole spices, nuts, seeds, millets, dry fruits, farm direct India",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
