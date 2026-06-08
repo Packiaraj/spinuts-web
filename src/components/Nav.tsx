@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { ShoppingBag, Menu, X } from 'lucide-react';
 import { useStore } from '@/lib/store';
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
 
 export default function Nav() {
   const cartCount = useStore((s) => s.cartCount());
@@ -47,16 +46,10 @@ export default function Nav() {
             ))}
           </div>
 
-          {/* Logo center (only on scroll / desktop) */}
-          <Link href="/" className="flex items-center justify-center">
-            <Image
-              src="/logo.png"
-              alt="SpiNuts"
-              width={44}
-              height={44}
-              style={{ objectFit: 'contain' }}
-              priority
-            />
+          {/* SpiNuts text center link */}
+          <Link href="/" className="font-semibold text-sm tracking-wide"
+            style={{ fontFamily: "'Playfair Display', serif", color: '#2C1708', fontSize: '1.1rem' }}>
+            SpiNuts
           </Link>
 
           {/* Right: cart + mobile menu */}
@@ -80,9 +73,7 @@ export default function Nav() {
       {/* Mobile menu */}
       {menuOpen && (
         <div className="fixed inset-0 z-40 flex flex-col pt-20 px-6" style={{ backgroundColor: '#2C1708' }}>
-          <div className="flex justify-center mb-10">
-            <Image src="/logo.png" alt="SpiNuts" width={90} height={90} style={{ objectFit: 'contain' }} />
-          </div>
+          <p className="text-center mb-10" style={{ fontFamily: "'Playfair Display', serif", color: '#FBF5EC', fontSize: '1.5rem' }}>SpiNuts</p>
           {[['Shop', '/products'], ['Our Story', '/story'], ['Cart', '/cart']].map(([label, href]) => (
             <Link key={label} href={href} onClick={() => setMenuOpen(false)}
               className="py-5 text-2xl font-medium border-b"
