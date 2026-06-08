@@ -187,27 +187,38 @@ export default function HomePage() {
   return (
     <div style={{ backgroundColor: '#FBF5EC' }}>
 
-      {/* ── HERO: full banner image only ── */}
-      <section className="hero-line-1 relative w-full">
+      {/* ── HERO: banner image, 16:9 crop so button stays visible ── */}
+      <section className="hero-line-1 relative w-full" style={{
+        aspectRatio: '16/9',
+        overflow: 'hidden',
+        maxHeight: '90vh',
+      }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/banner.jpg"
           alt="SpiNuts — Pure Indian Spices & Premium Nuts"
-          className="w-full block"
-          style={{ objectFit: 'cover' }}
+          style={{
+            width: '100%', height: '100%',
+            objectFit: 'cover', objectPosition: 'top center',
+            display: 'block',
+          }}
         />
-        {/* Transparent click overlay on the baked-in "SHOP OUR BLENDS" button */}
+        {/* Transparent overlay on the "SHOP OUR BLENDS" button baked into image.
+            Button sits at ~35% from top of the 1:1 image.
+            In a 16:9 crop (top-aligned), that maps to ~62% of container height. */}
         <Link
           href="/products"
           aria-label="Shop Our Blends"
           style={{
             position: 'absolute',
-            top: '38%',
+            top: '59%',
             left: '52%',
-            width: '43%',
-            height: '10%',
-            borderRadius: 6,
+            width: '42%',
+            height: '12%',
+            borderRadius: 8,
             cursor: 'pointer',
+            /* Debug: uncomment to see overlay box */
+            /* backgroundColor: 'rgba(255,0,0,0.4)', */
           }}
         />
       </section>
