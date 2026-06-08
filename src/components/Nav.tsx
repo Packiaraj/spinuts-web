@@ -37,7 +37,7 @@ export default function Nav() {
                 key={label}
                 href={href}
                 className="relative text-sm font-medium group transition-colors duration-300"
-                style={{ color: scrolled ? '#2C1708' : '#FBF5EC' }}
+                style={{ color: '#2C1708' }}
               >
                 {label}
                 <span className="absolute -bottom-0.5 left-0 h-px transition-all duration-300 w-0 group-hover:w-full"
@@ -48,10 +48,10 @@ export default function Nav() {
 
           {/* Right: home + cart + mobile menu */}
           <div className="flex items-center gap-5">
-            <Link href="/" style={{ color: scrolled ? '#2C1708' : '#FBF5EC' }}>
+            <Link href="/" style={{ color: '#2C1708' }}>
               <Home size={19} strokeWidth={1.6} />
             </Link>
-            <Link href="/cart" className="relative" style={{ color: scrolled ? '#2C1708' : '#FBF5EC' }}>
+            <Link href="/cart" className="relative" style={{ color: '#2C1708' }}>
               <ShoppingBag size={20} strokeWidth={1.6} />
               {cartCount > 0 && (
                 <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full text-white flex items-center justify-center font-semibold"
@@ -60,7 +60,7 @@ export default function Nav() {
                 </span>
               )}
             </Link>
-            <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)} style={{ color: scrolled ? '#2C1708' : '#FBF5EC' }}>
+            <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)} style={{ color: '#2C1708' }}>
               {menuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
