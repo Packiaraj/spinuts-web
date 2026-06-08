@@ -185,26 +185,26 @@ export default function HomePage() {
   const filtered = activeCategory === 'all' ? products : products.filter((p) => p.category === activeCategory);
 
   return (
-    <div style={{
-      backgroundImage: 'url(/banner.jpg)',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center top',
-      backgroundRepeat: 'no-repeat',
-      backgroundAttachment: 'fixed',
-    }}>
+    <div style={{ backgroundColor: '#FBF5EC' }}>
 
-      {/* ── HERO: full viewport height spacer so banner shows, then content below ── */}
-      <section className="hero-line-1 relative" style={{ minHeight: '100vh' }}>
-        {/* Clickable overlay on the "SHOP OUR BLENDS" button baked into the banner */}
+      {/* ── HERO: full banner image, no crop ── */}
+      <section className="hero-line-1 relative w-full">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/banner.jpg"
+          alt="SpiNuts — Pure Indian Spices & Premium Nuts"
+          style={{ width: '100%', height: 'auto', display: 'block' }}
+        />
+        {/* Transparent clickable overlay on the "SHOP OUR BLENDS" button in the image */}
         <Link
           href="/products"
           aria-label="Shop Our Blends"
           style={{
             position: 'absolute',
-            bottom: '12%',
+            top: '72%',
             left: '52%',
             width: '38%',
-            height: '8%',
+            height: '9%',
             borderRadius: 8,
             cursor: 'pointer',
             /* Debug: uncomment to see overlay */
@@ -213,8 +213,8 @@ export default function HomePage() {
         />
       </section>
 
-      {/* ── rest of page on cream bg ── */}
-      <div style={{ backgroundColor: '#FBF5EC' }}>
+      {/* ── rest of page ── */}
+      <div>
 
       {/* ── TRUST ── */}
       <TrustBar />
