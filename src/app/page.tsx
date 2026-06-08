@@ -1,6 +1,5 @@
 'use client';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 import ProductCard from '@/components/ProductCard';
 import { PageLoader } from '@/components/SpiceLoader';
