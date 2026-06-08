@@ -300,13 +300,13 @@ export default function CheckoutPage() {
                 <span className="text-xs font-medium text-gray-700">PhonePe</span>
               </label>
 
-              {/* QR Code */}
+              {/* QR Code — just triggers razorpay */}
               <label className="flex flex-col items-center gap-2 p-3 cursor-pointer transition-all rounded-sm"
-                style={{ border: `1.5px solid ${paymentMethod === 'razorpay' && false ? '#1B4332' : paymentMethod === 'qr' ? '#1B4332' : 'rgba(0,0,0,0.1)'}`, backgroundColor: (paymentMethod as string) === 'qr' ? 'rgba(27,67,50,0.05)' : 'white' }}>
-                <input type="radio" name="payment" value="qr" className="hidden"
-                  checked={(paymentMethod as string) === 'qr'} onChange={() => setPaymentMethod('razorpay')} />
+                style={{ border: `1.5px solid ${paymentMethod === 'razorpay' ? '#1B4332' : 'rgba(0,0,0,0.1)'}`, backgroundColor: paymentMethod === 'razorpay' ? 'rgba(27,67,50,0.05)' : 'white' }}>
+                <input type="radio" name="payment" value="razorpay" className="hidden"
+                  checked={paymentMethod === 'razorpay'} onChange={() => setPaymentMethod('razorpay')} />
                 <div className="text-2xl">⬛</div>
-                <span className="text-xs font-medium text-gray-700">Scan QR</span>
+                <span className="text-xs font-medium text-gray-700">More Options</span>
               </label>
             </div>
 
