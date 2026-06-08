@@ -1,113 +1,190 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/lib/store';
+import { SpiceLoader } from '@/components/SpiceLoader';
 
-type PaymentMethod = 'razorpay' | 'stripe' | 'cod';
+type PaymentMethod = 'razorpay' | 'cod';
+
+function loadRazorpayScript(): Promise<boolean> {
+  return new Promise((resolve) => {
+    if (document.getElementById('razorpay-script')) return resolve(true);
+    const script = document.createElement('script');
+    script.id = 'razorpay-script';
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+}
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { cart, currency, cartTotal, clearCart } = useStore();
-  const symbol = currency === 'INR' ? '₹' : '$';
+  const { cart, cartTotal, clearCart } = useStore();
   const total = cartTotal();
 
   const [form, setForm] = useState({
     name: '', email: '', phone: '',
-    line1: '', line2: '', city: '', state: '', pincode: '', country: currency === 'INR' ? 'India' : 'USA',
+    line1: '', line2: '', city: '', state: '', pincode: '',
   });
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(currency === 'INR' ? 'razorpay' : 'stripe');
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('razorpay');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => { loadRazorpayScript(); }, []);
 
   function update(field: string, val: string) {
     setForm((f) => ({ ...f, [field]: val }));
   }
 
+  async function handleRazorpay() {
+    const loaded = await loadRazorpayScript();
+    if (!loaded) { setError('Failed to load Razorpay. Please check your connection.'); return; }
+
+    const res = await fetch('/api/checkout/razorpay', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount: total, customer: form }),
+    });
+    const data = await res.json();
+
+    if (!data.orderId) {
+      setError(data.error || 'Could not create order. Please try again.');
+      return;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const Razorpay = (window as any).Razorpay;
+    const rzp = new Razorpay({
+      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+      amount: data.amount,
+      currency: 'INR',
+      order_id: data.orderId,
+      name: 'SpiNuts',
+      description: 'Premium Spices & Nuts from the Western Ghats',
+      image: 'https://spinuts.store/favicon.ico',
+      prefill: {
+        name: form.name,
+        email: form.email,
+        contact: form.phone,
+      },
+      notes: {
+        address: `${form.line1}, ${form.city}, ${form.state} - ${form.pincode}`,
+      },
+      theme: { color: '#1B4332' },
+      handler: async (response: {
+        razorpay_order_id: string;
+        razorpay_payment_id: string;
+        razorpay_signature: string;
+      }) => {
+        // Verify signature server-side
+        const verifyRes = await fetch('/api/checkout/razorpay', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(response),
+        });
+        const { verified } = await verifyRes.json();
+        if (verified) {
+          // Save order to Supabase
+          try {
+            const { supabase } = await import('@/lib/supabase');
+            await supabase.from('orders').insert([{
+              customer_name: form.name,
+              customer_email: form.email,
+              customer_phone: form.phone,
+              address: `${form.line1}${form.line2 ? ', ' + form.line2 : ''}, ${form.city}, ${form.state} - ${form.pincode}`,
+              items: cart,
+              total,
+              payment_method: 'razorpay',
+              payment_id: response.razorpay_payment_id,
+              status: 'confirmed',
+            }]);
+          } catch { /* log but don't block */ }
+          clearCart();
+          router.push('/checkout/success');
+        } else {
+          setError('Payment verification failed. Please contact support.');
+        }
+        setLoading(false);
+      },
+      modal: {
+        ondismiss: () => { setLoading(false); },
+      },
+    });
+
+    rzp.open();
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setError('');
     setLoading(true);
 
     if (paymentMethod === 'cod') {
-      // Simulate order placement
-      setTimeout(() => {
-        clearCart();
-        router.push('/checkout/success');
-      }, 1000);
+      try {
+        const { supabase } = await import('@/lib/supabase');
+        await supabase.from('orders').insert([{
+          customer_name: form.name,
+          customer_email: form.email,
+          customer_phone: form.phone,
+          address: `${form.line1}${form.line2 ? ', ' + form.line2 : ''}, ${form.city}, ${form.state} - ${form.pincode}`,
+          items: cart,
+          total,
+          payment_method: 'cod',
+          status: 'pending',
+        }]);
+      } catch { /* ignore */ }
+      clearCart();
+      router.push('/checkout/success');
       return;
     }
 
     if (paymentMethod === 'razorpay') {
-      try {
-        const res = await fetch('/api/checkout/razorpay', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ amount: total, currency: 'INR', customer: form }),
-        });
-        const data = await res.json();
-        if (data.orderId) {
-          const Razorpay = (window as unknown as { Razorpay: new (opts: unknown) => { open: () => void } }).Razorpay;
-          const rzp = new Razorpay({
-            key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-            amount: total * 100,
-            currency: 'INR',
-            order_id: data.orderId,
-            name: 'SpiNuts',
-            description: 'Premium Kerala Spices & Nuts',
-            prefill: { name: form.name, email: form.email, contact: form.phone },
-            handler: () => { clearCart(); router.push('/checkout/success'); },
-          });
-          rzp.open();
-        }
-      } catch (err) {
-        console.error(err);
-        alert('Payment failed. Please try again.');
-      }
-      setLoading(false);
-    }
-
-    if (paymentMethod === 'stripe') {
-      try {
-        const res = await fetch('/api/checkout/stripe', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ amount: total, currency: 'USD', customer: form, items: cart }),
-        });
-        const data = await res.json();
-        if (data.url) window.location.href = data.url;
-      } catch (err) {
-        console.error(err);
-        alert('Payment failed. Please try again.');
-      }
-      setLoading(false);
+      await handleRazorpay();
     }
   }
 
-  const inputClass = "w-full text-sm py-2.5 px-3 bg-white transition-colors";
-  const inputStyle = { border: '0.5px solid rgba(0,0,0,0.15)' };
+  const inp = "w-full text-sm py-2.5 px-3 bg-white";
+  const inpS = { border: '0.5px solid rgba(0,0,0,0.15)' };
+
+  if (cart.length === 0) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4">
+        <p className="text-5xl">🛒</p>
+        <p className="text-lg font-medium">Your cart is empty</p>
+        <a href="/products" className="label-tag px-6 py-3" style={{ backgroundColor: '#1B4332', color: '#FFF8F0' }}>
+          Shop Products
+        </a>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-12">
       <h1 className="text-2xl font-medium mb-10" style={{ fontWeight: 500 }}>Checkout</h1>
 
       <form onSubmit={handleSubmit} className="grid md:grid-cols-3 gap-10">
-        {/* Left: form */}
+        {/* Left */}
         <div className="md:col-span-2 space-y-8">
+
           {/* Customer */}
           <div>
             <p className="label-tag mb-4" style={{ color: '#1B4332' }}>Customer Details</p>
             <div className="grid grid-cols-2 gap-3">
               <div className="col-span-2">
-                <label className="label-tag text-gray-500 block mb-1">Full Name</label>
-                <input required className={inputClass} style={inputStyle} value={form.name}
+                <label className="label-tag text-gray-500 block mb-1">Full Name *</label>
+                <input required className={inp} style={inpS} value={form.name}
                   onChange={(e) => update('name', e.target.value)} />
               </div>
               <div>
-                <label className="label-tag text-gray-500 block mb-1">Email</label>
-                <input required type="email" className={inputClass} style={inputStyle} value={form.email}
+                <label className="label-tag text-gray-500 block mb-1">Email *</label>
+                <input required type="email" className={inp} style={inpS} value={form.email}
                   onChange={(e) => update('email', e.target.value)} />
               </div>
               <div>
-                <label className="label-tag text-gray-500 block mb-1">Phone</label>
-                <input required className={inputClass} style={inputStyle} value={form.phone}
+                <label className="label-tag text-gray-500 block mb-1">Phone *</label>
+                <input required type="tel" className={inp} style={inpS} value={form.phone}
+                  placeholder="+91 9876543210"
                   onChange={(e) => update('phone', e.target.value)} />
               </div>
             </div>
@@ -118,37 +195,29 @@ export default function CheckoutPage() {
             <p className="label-tag mb-4" style={{ color: '#1B4332' }}>Delivery Address</p>
             <div className="grid grid-cols-2 gap-3">
               <div className="col-span-2">
-                <label className="label-tag text-gray-500 block mb-1">Address Line 1</label>
-                <input required className={inputClass} style={inputStyle} value={form.line1}
+                <label className="label-tag text-gray-500 block mb-1">Address Line 1 *</label>
+                <input required className={inp} style={inpS} value={form.line1}
                   onChange={(e) => update('line1', e.target.value)} />
               </div>
               <div className="col-span-2">
                 <label className="label-tag text-gray-500 block mb-1">Address Line 2</label>
-                <input className={inputClass} style={inputStyle} value={form.line2}
+                <input className={inp} style={inpS} value={form.line2}
                   onChange={(e) => update('line2', e.target.value)} />
               </div>
               <div>
-                <label className="label-tag text-gray-500 block mb-1">City</label>
-                <input required className={inputClass} style={inputStyle} value={form.city}
+                <label className="label-tag text-gray-500 block mb-1">City *</label>
+                <input required className={inp} style={inpS} value={form.city}
                   onChange={(e) => update('city', e.target.value)} />
               </div>
               <div>
-                <label className="label-tag text-gray-500 block mb-1">State</label>
-                <input required className={inputClass} style={inputStyle} value={form.state}
+                <label className="label-tag text-gray-500 block mb-1">State *</label>
+                <input required className={inp} style={inpS} value={form.state}
                   onChange={(e) => update('state', e.target.value)} />
               </div>
               <div>
-                <label className="label-tag text-gray-500 block mb-1">PIN / ZIP Code</label>
-                <input required className={inputClass} style={inputStyle} value={form.pincode}
-                  onChange={(e) => update('pincode', e.target.value)} />
-              </div>
-              <div>
-                <label className="label-tag text-gray-500 block mb-1">Country</label>
-                <select required className={inputClass} style={inputStyle} value={form.country}
-                  onChange={(e) => update('country', e.target.value)}>
-                  <option>India</option>
-                  <option>USA</option>
-                </select>
+                <label className="label-tag text-gray-500 block mb-1">PIN Code *</label>
+                <input required className={inp} style={inpS} value={form.pincode}
+                  maxLength={6} onChange={(e) => update('pincode', e.target.value)} />
               </div>
             </div>
           </div>
@@ -156,69 +225,79 @@ export default function CheckoutPage() {
           {/* Payment */}
           <div>
             <p className="label-tag mb-4" style={{ color: '#1B4332' }}>Payment Method</p>
-            <div className="space-y-2">
-              {currency === 'INR' && (
-                <>
-                  <label className="flex items-center gap-3 p-4 cursor-pointer"
-                    style={{ border: `0.5px solid ${paymentMethod === 'razorpay' ? '#1B4332' : 'rgba(0,0,0,0.12)'}` }}>
-                    <input type="radio" name="payment" value="razorpay"
-                      checked={paymentMethod === 'razorpay'} onChange={() => setPaymentMethod('razorpay')} />
-                    <div>
-                      <p className="text-sm font-medium">Razorpay</p>
-                      <p className="text-xs text-gray-500">UPI, Cards, Net Banking, Wallets</p>
-                    </div>
-                  </label>
-                  <label className="flex items-center gap-3 p-4 cursor-pointer"
-                    style={{ border: `0.5px solid ${paymentMethod === 'cod' ? '#1B4332' : 'rgba(0,0,0,0.12)'}` }}>
-                    <input type="radio" name="payment" value="cod"
-                      checked={paymentMethod === 'cod'} onChange={() => setPaymentMethod('cod')} />
-                    <div>
-                      <p className="text-sm font-medium">Cash on Delivery</p>
-                      <p className="text-xs text-gray-500">Pay when your order arrives</p>
-                    </div>
-                  </label>
-                </>
-              )}
-              {currency === 'USD' && (
-                <label className="flex items-center gap-3 p-4 cursor-pointer"
-                  style={{ border: `0.5px solid ${paymentMethod === 'stripe' ? '#1B4332' : 'rgba(0,0,0,0.12)'}` }}>
-                  <input type="radio" name="payment" value="stripe"
-                    checked={paymentMethod === 'stripe'} onChange={() => setPaymentMethod('stripe')} />
-                  <div>
-                    <p className="text-sm font-medium">Stripe</p>
-                    <p className="text-xs text-gray-500">Credit / Debit Card, Apple Pay, Google Pay</p>
+            <div className="space-y-3">
+
+              <label className="flex items-start gap-4 p-4 cursor-pointer transition-colors"
+                style={{ border: `0.5px solid ${paymentMethod === 'razorpay' ? '#1B4332' : 'rgba(0,0,0,0.12)'}`,
+                  backgroundColor: paymentMethod === 'razorpay' ? 'rgba(27,67,50,0.03)' : 'white' }}>
+                <input type="radio" name="payment" value="razorpay" className="mt-0.5"
+                  checked={paymentMethod === 'razorpay'} onChange={() => setPaymentMethod('razorpay')} />
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="text-sm font-medium">Pay Online</p>
+                    <span className="label-tag px-2 py-0.5 text-white" style={{ backgroundColor: '#1B4332', fontSize: '0.6rem' }}>Recommended</span>
                   </div>
-                </label>
-              )}
+                  <p className="text-xs text-gray-500">UPI · Credit/Debit Card · Net Banking · Wallets</p>
+                  <div className="flex gap-2 mt-2 flex-wrap">
+                    {['UPI', 'Visa', 'Mastercard', 'Paytm', 'GPay', 'PhonePe'].map((m) => (
+                      <span key={m} className="label-tag px-2 py-0.5 text-gray-500"
+                        style={{ border: '0.5px solid rgba(0,0,0,0.1)', fontSize: '0.6rem' }}>{m}</span>
+                    ))}
+                  </div>
+                </div>
+              </label>
+
+              <label className="flex items-start gap-4 p-4 cursor-pointer transition-colors"
+                style={{ border: `0.5px solid ${paymentMethod === 'cod' ? '#1B4332' : 'rgba(0,0,0,0.12)'}`,
+                  backgroundColor: paymentMethod === 'cod' ? 'rgba(27,67,50,0.03)' : 'white' }}>
+                <input type="radio" name="payment" value="cod" className="mt-0.5"
+                  checked={paymentMethod === 'cod'} onChange={() => setPaymentMethod('cod')} />
+                <div>
+                  <p className="text-sm font-medium mb-1">Cash on Delivery</p>
+                  <p className="text-xs text-gray-500">Pay in cash when your order arrives</p>
+                </div>
+              </label>
+
             </div>
           </div>
+
+          {error && (
+            <div className="p-4 text-sm text-red-600" style={{ border: '0.5px solid #fcc', backgroundColor: '#fff8f8' }}>
+              {error}
+            </div>
+          )}
         </div>
 
         {/* Right: summary */}
-        <div className="md:col-span-1">
+        <div>
           <div className="p-6 bg-white sticky top-24" style={{ border: '0.5px solid rgba(0,0,0,0.1)' }}>
             <p className="label-tag mb-4" style={{ color: '#1B4332' }}>Order Summary</p>
-            {cart.map((item) => {
-              const price = currency === 'INR' ? item.product.price_inr : item.product.price_usd;
-              return (
-                <div key={item.product.id} className="flex justify-between text-xs mb-2 text-gray-600">
-                  <span>{item.product.name} × {item.quantity}</span>
-                  <span>{symbol}{(price * item.quantity).toFixed(0)}</span>
+            <div className="space-y-2 mb-4">
+              {cart.map((item) => (
+                <div key={item.product.id} className="flex justify-between text-xs text-gray-600">
+                  <span className="flex-1 pr-2">{item.product.name.split(' / ')[0]} × {item.quantity}</span>
+                  <span className="shrink-0">₹{(item.product.price_inr * item.quantity).toFixed(0)}</span>
                 </div>
-              );
-            })}
-            <div className="flex justify-between font-medium mt-4 pt-4 text-sm"
+              ))}
+            </div>
+            <div className="flex justify-between font-medium pt-4 text-sm"
               style={{ borderTop: '0.5px solid rgba(0,0,0,0.08)' }}>
               <span>Total</span>
-              <span style={{ color: '#1B4332' }}>{symbol}{total.toFixed(0)}</span>
+              <span style={{ color: '#1B4332' }}>₹{total.toFixed(0)}</span>
             </div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="block w-full text-center py-3 mt-6 label-tag transition-opacity hover:opacity-90 disabled:opacity-50"
+            <p className="text-xs text-gray-400 mt-2">Free delivery · No hidden charges</p>
+
+            <button type="submit" disabled={loading}
+              className="w-full py-3.5 mt-6 label-tag transition-opacity hover:opacity-90 disabled:opacity-60 flex items-center justify-center gap-2"
               style={{ backgroundColor: '#1B4332', color: '#FFF8F0' }}>
-              {loading ? 'Processing...' : 'Place Order'}
+              {loading
+                ? <><SpiceLoader size="sm" /> Processing...</>
+                : paymentMethod === 'cod' ? 'Place Order' : 'Pay ₹' + total.toFixed(0)}
             </button>
+
+            <p className="text-center text-xs text-gray-400 mt-3">
+              🔒 Secured by Razorpay
+            </p>
           </div>
         </div>
       </form>
