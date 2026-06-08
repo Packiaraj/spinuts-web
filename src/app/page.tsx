@@ -189,11 +189,16 @@ export default function HomePage() {
               Read Our Story →
             </Link>
           </div>
-          <div className="aspect-square flex items-center justify-center"
-            style={{ backgroundColor: '#0F2D22', border: '0.5px solid rgba(255,248,240,0.1)' }}>
-            <div className="text-center">
-              <p className="text-6xl mb-4">🌿</p>
-              <p className="label-tag" style={{ color: 'rgba(255,248,240,0.4)' }}>Kerala Farms</p>
+          <div className="aspect-square overflow-hidden relative"
+            style={{ border: '0.5px solid rgba(255,248,240,0.1)' }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800&q=80"
+              alt="Spices from the Western Ghats"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute bottom-0 left-0 right-0 px-5 py-4" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.6), transparent)' }}>
+              <p className="label-tag" style={{ color: 'rgba(255,248,240,0.7)' }}>Western Ghats · Forest to Table</p>
             </div>
           </div>
         </div>
