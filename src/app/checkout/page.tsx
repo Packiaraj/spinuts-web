@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useStore } from '@/lib/store';
 import { SpiceLoader } from '@/components/SpiceLoader';
 
-type PaymentMethod = 'razorpay' | 'cod';
+type PaymentMethod = 'razorpay' | 'gpay' | 'phonepe' | 'cod';
 
 function loadRazorpayScript(): Promise<boolean> {
   return new Promise((resolve) => {
@@ -37,7 +37,7 @@ export default function CheckoutPage() {
     setForm((f) => ({ ...f, [field]: val }));
   }
 
-  async function handleRazorpay() {
+  async function handleRazorpay(upiApp?: 'gpay' | 'phonepe') {
     const loaded = await loadRazorpayScript();
     if (!loaded) { setError('Failed to load Razorpay. Please check your connection.'); return; }
 
@@ -56,6 +56,17 @@ export default function CheckoutPage() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const Razorpay = (window as any).Razorpay;
     const rzp = new Razorpay({
+      ...(upiApp && {
+        config: {
+          display: {
+            blocks: {
+              utib: { name: upiApp === 'gpay' ? 'Pay via GPay' : 'Pay via PhonePe', instruments: [{ method: 'upi', apps: [upiApp === 'gpay' ? 'google_pay' : 'phonepe'] }] },
+            },
+            sequence: ['block.utib'],
+            preferences: { show_default_blocks: false },
+          },
+        },
+      }),
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
       amount: data.amount,
       currency: 'INR',
@@ -139,9 +150,9 @@ export default function CheckoutPage() {
       return;
     }
 
-    if (paymentMethod === 'razorpay') {
-      await handleRazorpay();
-    }
+    if (paymentMethod === 'razorpay') await handleRazorpay();
+    if (paymentMethod === 'gpay') await handleRazorpay('gpay');
+    if (paymentMethod === 'phonepe') await handleRazorpay('phonepe');
   }
 
   const inp = "w-full text-sm py-2.5 px-3 bg-white";
@@ -225,8 +236,31 @@ export default function CheckoutPage() {
           {/* Payment */}
           <div>
             <p className="label-tag mb-4" style={{ color: '#1B4332' }}>Payment Method</p>
-            <div className="space-y-3">
 
+            {/* Quick UPI buttons */}
+            <p className="label-tag text-gray-400 mb-2">Quick Pay via UPI</p>
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              {[
+                { id: 'gpay' as const, label: 'GPay', emoji: '🟢', color: '#1a73e8', bg: '#e8f0fe' },
+                { id: 'phonepe' as const, label: 'PhonePe', emoji: '🟣', color: '#5f259f', bg: '#f3e8ff' },
+              ].map((app) => (
+                <label key={app.id} className="flex items-center gap-3 p-3 cursor-pointer transition-all"
+                  style={{
+                    border: `0.5px solid ${paymentMethod === app.id ? app.color : 'rgba(0,0,0,0.12)'}`,
+                    backgroundColor: paymentMethod === app.id ? app.bg : 'white',
+                  }}>
+                  <input type="radio" name="payment" value={app.id}
+                    checked={paymentMethod === app.id} onChange={() => setPaymentMethod(app.id)} />
+                  <span className="text-lg">{app.emoji}</span>
+                  <div>
+                    <p className="text-sm font-medium">{app.label}</p>
+                    <p className="text-xs text-gray-400">UPI · Instant</p>
+                  </div>
+                </label>
+              ))}
+            </div>
+
+            <div className="space-y-3">
               <label className="flex items-start gap-4 p-4 cursor-pointer transition-colors"
                 style={{ border: `0.5px solid ${paymentMethod === 'razorpay' ? '#1B4332' : 'rgba(0,0,0,0.12)'}`,
                   backgroundColor: paymentMethod === 'razorpay' ? 'rgba(27,67,50,0.03)' : 'white' }}>
@@ -234,16 +268,10 @@ export default function CheckoutPage() {
                   checked={paymentMethod === 'razorpay'} onChange={() => setPaymentMethod('razorpay')} />
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <p className="text-sm font-medium">Pay Online</p>
+                    <p className="text-sm font-medium">All Payment Options</p>
                     <span className="label-tag px-2 py-0.5 text-white" style={{ backgroundColor: '#1B4332', fontSize: '0.6rem' }}>Recommended</span>
                   </div>
-                  <p className="text-xs text-gray-500">UPI · Credit/Debit Card · Net Banking · Wallets</p>
-                  <div className="flex gap-2 mt-2 flex-wrap">
-                    {['UPI', 'Visa', 'Mastercard', 'Paytm', 'GPay', 'PhonePe'].map((m) => (
-                      <span key={m} className="label-tag px-2 py-0.5 text-gray-500"
-                        style={{ border: '0.5px solid rgba(0,0,0,0.1)', fontSize: '0.6rem' }}>{m}</span>
-                    ))}
-                  </div>
+                  <p className="text-xs text-gray-500">UPI · Cards · Net Banking · Paytm · Wallets</p>
                 </div>
               </label>
 
