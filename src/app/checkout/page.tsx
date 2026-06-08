@@ -56,7 +56,7 @@ export default function CheckoutPage() {
     setForm((f) => ({ ...f, [field]: val }));
   }
 
-  async function handleRazorpay(upiApp?: 'gpay' | 'phonepe') {
+  async function handleRazorpay() {
     const loaded = await loadRazorpayScript();
     if (!loaded) { setError('Failed to load Razorpay. Please check your connection.'); return; }
 
@@ -75,17 +75,6 @@ export default function CheckoutPage() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const Razorpay = (window as any).Razorpay;
     const rzp = new Razorpay({
-      ...(upiApp && {
-        config: {
-          display: {
-            blocks: {
-              utib: { name: upiApp === 'gpay' ? 'Pay via GPay' : 'Pay via PhonePe', instruments: [{ method: 'upi', apps: [upiApp === 'gpay' ? 'google_pay' : 'phonepe'] }] },
-            },
-            sequence: ['block.utib'],
-            preferences: { show_default_blocks: false },
-          },
-        },
-      }),
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
       amount: data.amount,
       currency: 'INR',
@@ -174,9 +163,9 @@ export default function CheckoutPage() {
       return;
     }
 
-    if (paymentMethod === 'razorpay') await handleRazorpay();
-    if (paymentMethod === 'gpay') await handleRazorpay('gpay');
-    if (paymentMethod === 'phonepe') await handleRazorpay('phonepe');
+    if (paymentMethod === 'razorpay' || paymentMethod === 'gpay' || paymentMethod === 'phonepe') {
+      await handleRazorpay();
+    }
   }
 
   // Shipping calculation
