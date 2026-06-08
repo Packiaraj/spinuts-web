@@ -46,11 +46,7 @@ export default function Nav() {
             ))}
           </div>
 
-          {/* SpiNuts text center link */}
-          <Link href="/" className="font-semibold text-sm tracking-wide"
-            style={{ fontFamily: "'Playfair Display', serif", color: '#2C1708', fontSize: '1.1rem' }}>
-            SpiNuts
-          </Link>
+          <div />
 
           {/* Right: cart + mobile menu */}
           <div className="flex items-center gap-5">
