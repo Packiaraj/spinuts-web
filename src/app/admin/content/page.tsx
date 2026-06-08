@@ -26,23 +26,23 @@ interface SiteContent {
 
 const DEFAULTS: SiteContent = {
   hero_headline: 'Pure spices.\nReal origin.\nNo middlemen.',
-  hero_subtext: 'Family-sourced whole spices and nuts directly from Kerala and Tamil Nadu farms. Unprocessed, unadulterated, and delivered to your door.',
+  hero_subtext: 'Whole spices and nuts sourced directly from the forests and farms of the Western Ghats. Unprocessed, unadulterated, and delivered to your door.',
   hero_cta: 'Shop All Products',
-  story_headline: "From our family's farms\nto your kitchen.",
-  story_body1: "SpiNuts began with a simple belief: the best spices are whole spices, freshly sourced. Our family has been working directly with farmers in Kerala and Tamil Nadu for generations, cutting out every layer of middlemen so you get the real thing.",
-  story_body2: "Every batch is traceable to its farm. Every product is packed within days of harvest. That's the SpiNuts promise.",
+  story_headline: "From the heart of\nthe Western Ghats.",
+  story_body1: "SpiNuts began with a simple belief: the best spices are whole spices, freshly sourced. We work directly with farmers and forest communities deep in the Western Ghats — one of the world's richest biodiversity hotspots — cutting out every layer of middlemen so you get the real thing.",
+  story_body2: "Every batch is traceable to its source. Every product is packed within days of harvest. That's the SpiNuts promise.",
   story_promise: 'Read Our Story →',
   gift_title: 'Gift boxes available',
-  gift_subtitle: 'Curated spice and nut collections, beautifully packed.',
+  gift_subtitle: 'Curated spice and nut collections from the Western Ghats, beautifully packed.',
   trust_1_label: 'Farm Direct',
   trust_1_sub: 'No middlemen',
-  trust_2_label: 'Kerala Origin',
-  trust_2_sub: 'Certified source',
-  trust_3_label: 'Whole Spices',
-  trust_3_sub: 'Unprocessed, pure',
+  trust_2_label: 'Western Ghats',
+  trust_2_sub: 'Biodiversity hotspot',
+  trust_3_label: 'Whole & Pure',
+  trust_3_sub: 'Unprocessed, natural',
   trust_4_label: 'Pan India',
   trust_4_sub: 'Fast delivery',
-  banner_tag: 'Diwali Special',
+  banner_tag: 'Gift Special',
 };
 
 export default function AdminContentPage() {
