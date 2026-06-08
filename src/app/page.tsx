@@ -189,7 +189,7 @@ export default function HomePage() {
 
       {/* ── HERO: banner image, 16:9 crop so button stays visible ── */}
       <section className="hero-line-1 relative w-full" style={{
-        aspectRatio: '16/7',
+        aspectRatio: '16/8',
         overflow: 'hidden',
         maxHeight: '90vh',
       }}>
@@ -211,10 +211,10 @@ export default function HomePage() {
           aria-label="Shop Our Blends"
           style={{
             position: 'absolute',
-            top: '52%',
+            top: '63%',
             left: '52%',
             width: '42%',
-            height: '12%',
+            height: '13%',
             borderRadius: 8,
             cursor: 'pointer',
             /* Debug: uncomment to see overlay box */
