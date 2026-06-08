@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ShoppingBag, Menu, X } from 'lucide-react';
 import { useStore } from '@/lib/store';
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 
 export default function Nav() {
   const cartCount = useStore((s) => s.cartCount());
@@ -31,34 +32,16 @@ export default function Nav() {
           style={{ height: scrolled ? '60px' : '72px' }}
         >
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3">
-            <div
-              className="transition-all duration-300 flex items-center justify-center rounded-full"
-              style={{
-                width: scrolled ? 36 : 44,
-                height: scrolled ? 36 : 44,
-                border: '1.5px solid #C4783A',
-                backgroundColor: '#2C1A0E',
-                flexShrink: 0,
-              }}
-            >
-              <span style={{ fontSize: scrolled ? '1rem' : '1.2rem' }}>🌶️</span>
-            </div>
-            <div className="leading-none">
-              <p style={{
-                fontFamily: "'Playfair Display', serif",
-                fontWeight: 700,
-                fontSize: scrolled ? '1.1rem' : '1.25rem',
-                color: '#2C1A0E',
-                letterSpacing: '-0.01em',
-                transition: 'font-size 0.3s',
-              }}>
-                SpiNuts
-              </p>
-              <p className="tag" style={{ color: '#C4783A', fontSize: '0.52rem', marginTop: 1 }}>
-                Western Ghats
-              </p>
-            </div>
+          <Link href="/" className="flex items-center">
+            <Image
+              src="/logo.png"
+              alt="SpiNuts"
+              width={scrolled ? 52 : 64}
+              height={scrolled ? 52 : 64}
+              className="transition-all duration-300"
+              style={{ objectFit: 'contain' }}
+              priority
+            />
           </Link>
 
           {/* Desktop links */}
@@ -67,12 +50,12 @@ export default function Nav() {
               <Link
                 key={label}
                 href={href}
-                className="relative text-sm font-medium transition-colors group"
+                className="relative text-sm font-medium group"
                 style={{ color: '#2C1A0E' }}
               >
                 {label}
                 <span
-                  className="absolute -bottom-0.5 left-0 h-px bg-cinnamon transition-all duration-300 w-0 group-hover:w-full"
+                  className="absolute -bottom-0.5 left-0 h-px transition-all duration-300 w-0 group-hover:w-full"
                   style={{ backgroundColor: '#C4783A' }}
                 />
               </Link>
@@ -109,6 +92,16 @@ export default function Nav() {
           className="fixed inset-0 z-40 flex flex-col pt-20 px-6"
           style={{ backgroundColor: '#2C1A0E' }}
         >
+          <div className="flex justify-center mb-10">
+            <div style={{
+              width: 80, height: 80, borderRadius: '50%',
+              backgroundColor: '#FDF6EE',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              overflow: 'hidden',
+            }}>
+              <Image src="/logo.png" alt="SpiNuts" width={72} height={72} style={{ objectFit: 'contain' }} />
+            </div>
+          </div>
           {[['Shop', '/products'], ['Our Story', '/story'], ['Cart', '/cart']].map(([label, href]) => (
             <Link
               key={label}

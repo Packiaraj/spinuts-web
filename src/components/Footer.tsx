@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Footer() {
   return (
@@ -14,19 +15,22 @@ export default function Footer() {
         <div className="grid md:grid-cols-4 gap-12 mb-12">
           {/* Brand */}
           <div className="md:col-span-2">
-            <div className="flex items-center gap-3 mb-4">
+            <div className="flex items-center gap-4 mb-5">
               <div style={{
-                width: 44, height: 44, borderRadius: '50%',
-                border: '1.5px solid #C4783A', backgroundColor: '#2C1A0E',
+                width: 72, height: 72, borderRadius: '50%',
+                backgroundColor: '#FDF6EE',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
+                overflow: 'hidden', flexShrink: 0,
               }}>
-                <span style={{ fontSize: '1.2rem' }}>🌶️</span>
+                <Image src="/logo.png" alt="SpiNuts" width={66} height={66} style={{ objectFit: 'contain' }} />
               </div>
               <div>
                 <p style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.2rem', fontWeight: 700, color: '#FDF6EE' }}>
                   SpiNuts
                 </p>
-                <p className="tag" style={{ color: '#C4783A', fontSize: '0.52rem', marginTop: 1 }}>Western Ghats</p>
+                <p className="tag" style={{ color: '#C4783A', fontSize: '0.52rem', marginTop: 2 }}>
+                  Pure Spices · Traditional Blend
+                </p>
               </div>
             </div>
             <p style={{ color: 'rgba(253,246,238,0.5)', fontSize: '0.88rem', lineHeight: 1.8, maxWidth: 280 }}>

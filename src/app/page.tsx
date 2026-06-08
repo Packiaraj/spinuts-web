@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 import ProductCard from '@/components/ProductCard';
 import { PageLoader } from '@/components/SpiceLoader';
@@ -231,44 +232,55 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Decorative */}
+          {/* Logo showcase */}
           <div className="hidden md:flex items-center justify-center hero-line-2">
-            <div style={{ position: 'relative', width: 340, height: 380 }}>
+            <div style={{ position: 'relative', width: 340, height: 340 }}>
+              {/* Outer glow ring */}
               <div style={{
-                width: 270, height: 270, borderRadius: '50%',
-                border: '1px solid rgba(196,120,58,0.25)',
-                position: 'absolute', top: '50%', left: '50%',
-                transform: 'translate(-50%,-50%)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                backgroundColor: 'rgba(196,120,58,0.05)',
-              }}>
-                <div style={{ textAlign: 'center' }}>
-                  <p style={{ fontSize: '5rem', lineHeight: 1 }}>🌶️</p>
-                  <p className="tag mt-3" style={{ color: 'rgba(212,168,83,0.7)', letterSpacing: '0.2em', fontSize: '0.55rem' }}>
-                    Pure · Whole · Real
-                  </p>
-                </div>
-              </div>
-              <div style={{
-                width: 340, height: 340, borderRadius: '50%',
-                border: '1px dashed rgba(196,120,58,0.12)',
-                position: 'absolute', top: '50%', left: '50%',
-                transform: 'translate(-50%,-50%)',
+                position: 'absolute', inset: -20,
+                borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(196,120,58,0.15) 0%, transparent 70%)',
               }} />
+              {/* Dashed orbit */}
+              <div style={{
+                position: 'absolute', inset: -10,
+                borderRadius: '50%',
+                border: '1px dashed rgba(196,120,58,0.2)',
+              }} />
+              {/* Logo circle with cream bg */}
+              <div style={{
+                width: '100%', height: '100%',
+                borderRadius: '50%',
+                backgroundColor: '#FDF6EE',
+                border: '2px solid rgba(196,120,58,0.3)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                overflow: 'hidden',
+                boxShadow: '0 20px 60px rgba(44,26,14,0.4)',
+              }}>
+                <Image
+                  src="/logo.png"
+                  alt="SpiNuts"
+                  width={300}
+                  height={300}
+                  style={{ objectFit: 'contain', padding: 12 }}
+                  priority
+                />
+              </div>
+              {/* Floating badges */}
               {[
-                { emoji: '🥜', label: 'Nuts', top: '4%', left: '62%' },
-                { emoji: '🌿', label: 'Herbs', top: '74%', left: '68%' },
-                { emoji: '🌾', label: 'Millets', top: '76%', left: '4%' },
+                { emoji: '🥜', label: 'Nuts', top: '2%', left: '70%' },
+                { emoji: '🌿', label: 'Pure', top: '78%', left: '72%' },
+                { emoji: '🌾', label: 'Whole', top: '80%', left: '-2%' },
               ].map((b) => (
                 <div key={b.label} style={{
                   position: 'absolute', top: b.top, left: b.left,
-                  backgroundColor: 'rgba(44,26,14,0.9)',
-                  border: '1px solid rgba(196,120,58,0.3)',
-                  borderRadius: 8, padding: '8px 12px',
+                  backgroundColor: 'rgba(44,26,14,0.95)',
+                  border: '1px solid rgba(196,120,58,0.35)',
+                  borderRadius: 8, padding: '7px 11px',
                   display: 'flex', alignItems: 'center', gap: 6,
                 }}>
-                  <span style={{ fontSize: '1.1rem' }}>{b.emoji}</span>
-                  <span className="tag" style={{ color: '#FDF6EE', fontSize: '0.55rem' }}>{b.label}</span>
+                  <span style={{ fontSize: '1rem' }}>{b.emoji}</span>
+                  <span className="tag" style={{ color: '#FDF6EE', fontSize: '0.52rem' }}>{b.label}</span>
                 </div>
               ))}
             </div>
