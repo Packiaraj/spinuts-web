@@ -226,11 +226,25 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Bottom: Banner image */}
+        {/* Bottom: Banner image with clickable button overlay */}
         <div className="hero-line-2 relative w-full" style={{ maxHeight: 500, overflow: 'hidden' }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/banner.jpg" alt="Pure Indian Spices and Premium Nuts"
-            className="w-full object-cover object-top" style={{ maxHeight: 500 }} />
+            className="w-full object-cover object-top" style={{ maxHeight: 500, display: 'block' }} />
+
+          {/* Transparent overlay exactly on the "SHOP OUR BLENDS" button in the image */}
+          <Link href="/products" style={{
+            position: 'absolute',
+            top: '30%',
+            left: '52%',
+            width: '42%',
+            height: '11%',
+            borderRadius: 6,
+            cursor: 'pointer',
+            /* Uncomment below to debug position: */
+            /* backgroundColor: 'rgba(255,0,0,0.3)', */
+          }} aria-label="Shop Our Blends" />
+
           <div style={{
             position: 'absolute', bottom: 0, left: 0, right: 0, padding: '16px 32px',
             background: 'linear-gradient(to top, rgba(44,23,8,0.65) 0%, transparent 100%)',
