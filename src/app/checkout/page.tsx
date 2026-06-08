@@ -91,7 +91,7 @@ export default function CheckoutPage() {
       currency: 'INR',
       order_id: data.orderId,
       name: 'SpiNuts',
-      description: 'Premium Spices & Nuts from the Western Ghats',
+      description: `${cart.length} item(s) · Subtotal ₹${total.toFixed(0)} + Shipping ₹${shippingCharge}`,
       image: 'https://spinuts.store/favicon.ico',
       prefill: {
         name: form.name,
@@ -100,6 +100,9 @@ export default function CheckoutPage() {
       },
       notes: {
         address: `${form.line1}, ${form.city}, ${form.state} - ${form.pincode}`,
+        subtotal: `₹${total.toFixed(0)}`,
+        shipping: shippingCharge === 0 ? 'Free' : `₹${shippingCharge}`,
+        grand_total: `₹${grandTotal.toFixed(0)}`,
       },
       theme: { color: '#1B4332' },
       handler: async (response: {
