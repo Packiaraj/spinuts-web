@@ -185,43 +185,36 @@ export default function HomePage() {
   const filtered = activeCategory === 'all' ? products : products.filter((p) => p.category === activeCategory);
 
   return (
-    <div style={{ backgroundColor: '#FBF5EC' }}>
+    <div style={{
+      backgroundImage: 'url(/banner.jpg)',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center top',
+      backgroundRepeat: 'no-repeat',
+      backgroundAttachment: 'fixed',
+    }}>
 
-      {/* ── HERO: banner image, 16:9 crop so button stays visible ── */}
-      <section className="hero-line-1 relative w-full" style={{
-        aspectRatio: '16/6',
-        overflow: 'hidden',
-        maxHeight: '90vh',
-      }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/banner.jpg"
-          alt="SpiNuts — Pure Indian Spices & Premium Nuts"
-          style={{
-            width: '100%', height: '100%',
-            objectFit: 'cover', objectPosition: 'top center',
-            display: 'block',
-          }}
-        />
-        {/* Transparent overlay on the "SHOP OUR BLENDS" button baked into image.
-            Button sits at ~35% from top of the 1:1 image.
-            In a 16:9 crop (top-aligned), that maps to ~62% of container height. */}
+      {/* ── HERO: full viewport height spacer so banner shows, then content below ── */}
+      <section className="hero-line-1 relative" style={{ minHeight: '100vh' }}>
+        {/* Clickable overlay on the "SHOP OUR BLENDS" button baked into the banner */}
         <Link
           href="/products"
           aria-label="Shop Our Blends"
           style={{
             position: 'absolute',
-            top: '63%',
+            bottom: '12%',
             left: '52%',
-            width: '42%',
-            height: '13%',
+            width: '38%',
+            height: '8%',
             borderRadius: 8,
             cursor: 'pointer',
-            /* Debug: uncomment to see overlay box */
+            /* Debug: uncomment to see overlay */
             /* backgroundColor: 'rgba(255,0,0,0.4)', */
           }}
         />
       </section>
+
+      {/* ── rest of page on cream bg ── */}
+      <div style={{ backgroundColor: '#FBF5EC' }}>
 
       {/* ── TRUST ── */}
       <TrustBar />
@@ -290,6 +283,7 @@ export default function HomePage() {
       {/* ── GIFT ── */}
       <GiftSection />
 
+      </div>{/* end cream bg */}
     </div>
   );
 }
