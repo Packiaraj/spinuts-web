@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { ShoppingBag, Menu, X } from 'lucide-react';
+import { ShoppingBag, Menu, X, Home } from 'lucide-react';
 import { useStore } from '@/lib/store';
 import { useState, useEffect } from 'react';
 
@@ -46,10 +46,11 @@ export default function Nav() {
             ))}
           </div>
 
-          <div />
-
-          {/* Right: cart + mobile menu */}
+          {/* Right: home + cart + mobile menu */}
           <div className="flex items-center gap-5">
+            <Link href="/" style={{ color: '#2C1708' }}>
+              <Home size={19} strokeWidth={1.6} />
+            </Link>
             <Link href="/cart" className="relative" style={{ color: '#2C1708' }}>
               <ShoppingBag size={20} strokeWidth={1.6} />
               {cartCount > 0 && (
