@@ -12,7 +12,7 @@ export default function Footer() {
               Pure spices. Real origin. No middlemen.
             </p>
             <p className="mt-2 text-sm" style={{ color: 'rgba(255,248,240,0.6)' }}>
-              Sourced directly from Kerala &amp; Tamil Nadu farms.
+              Sourced directly from real farmers of the Western Ghats.
             </p>
           </div>
 

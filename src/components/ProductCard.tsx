@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { Product } from '@/lib/types';
 import { useStore } from '@/lib/store';
+import { AddingToCart } from './SpiceLoader';
 
 const CATEGORY_EMOJI: Record<string, string> = {
   spices: '🌶️',
@@ -22,6 +23,7 @@ export default function ProductCard({ product }: Props) {
   const originalPrice = currency === 'INR' ? product.original_price_inr : product.original_price_usd;
   const symbol = currency === 'INR' ? '₹' : '$';
   const [imgError, setImgError] = useState(false);
+  const [adding, setAdding] = useState(false);
 
   const hasImage = product.images?.[0] && !imgError;
 
@@ -74,11 +76,21 @@ export default function ProductCard({ product }: Props) {
             )}
           </div>
           <button
-            onClick={() => addToCart(product)}
-            className="label-tag px-3 py-2 transition-colors hover:bg-[#1B4332] hover:text-white"
-            style={{ border: '0.5px solid #1B4332', color: '#1B4332' }}
+            onClick={() => {
+              setAdding(true);
+              addToCart(product);
+              setTimeout(() => setAdding(false), 900);
+            }}
+            disabled={adding}
+            className="label-tag px-3 py-2 transition-all"
+            style={{
+              border: '0.5px solid #1B4332',
+              color: adding ? '#FFF8F0' : '#1B4332',
+              backgroundColor: adding ? '#1B4332' : 'transparent',
+              minWidth: 72,
+            }}
           >
-            Add
+            {adding ? <AddingToCart /> : 'Add'}
           </button>
         </div>
       </div>

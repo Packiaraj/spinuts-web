@@ -2,6 +2,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import ProductCard from '@/components/ProductCard';
+import { PageLoader } from '@/components/SpiceLoader';
 import { Product, Category } from '@/lib/types';
 import { SAMPLE_PRODUCTS } from '@/lib/sampleData';
 
@@ -113,18 +114,7 @@ function ProductsInner() {
             </select>
           </div>
           {loading ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {Array.from({ length: 9 }).map((_, i) => (
-                <div key={i} className="bg-white animate-pulse" style={{ border: '0.5px solid rgba(0,0,0,0.08)' }}>
-                  <div className="aspect-square" style={{ backgroundColor: '#f0ebe5' }} />
-                  <div className="p-4 space-y-2">
-                    <div className="h-2 rounded" style={{ backgroundColor: '#ede8e2', width: '40%' }} />
-                    <div className="h-3 rounded" style={{ backgroundColor: '#ede8e2', width: '80%' }} />
-                    <div className="h-2 rounded" style={{ backgroundColor: '#ede8e2', width: '30%' }} />
-                  </div>
-                </div>
-              ))}
-            </div>
+            <PageLoader />
           ) : (
             <>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
