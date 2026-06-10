@@ -188,7 +188,7 @@ export default function HomePage() {
     <div style={{ position: 'relative' }}>
 
       {/* ── BANNER: sticky behind content as user scrolls ── */}
-      <div style={{ position: 'sticky', top: 0, zIndex: 0 }}>
+      <div style={{ position: 'sticky', top: 68, zIndex: 0 }}>
         <div className="hero-line-1 relative w-full">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
