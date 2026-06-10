@@ -57,8 +57,16 @@ export default function AdminProductsPage() {
     setUploading(true);
     try {
       const { supabase } = await import('@/lib/supabase');
+
+      // Ensure bucket exists
+      const { data: buckets } = await supabase.storage.listBuckets();
+      const exists = buckets?.some((b) => b.name === 'products');
+      if (!exists) {
+        await supabase.storage.createBucket('products', { public: true });
+      }
+
       const ext = file.name.split('.').pop();
-      const path = `products/${Date.now()}.${ext}`;
+      const path = `${Date.now()}.${ext}`;
       const { error } = await supabase.storage.from('products').upload(path, file, { upsert: true });
       if (error) throw error;
       const { data } = supabase.storage.from('products').getPublicUrl(path);
@@ -195,15 +203,29 @@ export default function AdminProductsPage() {
                       </button>
                     </div>
                   ))}
-                  <button
-                    onClick={() => fileRef.current?.click()}
-                    disabled={uploading}
-                    className="w-24 h-24 flex flex-col items-center justify-center gap-1 text-gray-400 hover:text-[#1B4332] transition-colors disabled:opacity-50"
-                    style={{ border: '0.5px dashed rgba(0,0,0,0.2)' }}
-                  >
-                    <Upload size={18} />
-                    <span className="label-tag">{uploading ? 'Uploading...' : 'Upload'}</span>
-                  </button>
+                  {uploading ? (
+                    <div className="w-24 h-24 flex flex-col items-center justify-center gap-2"
+                      style={{ border: '0.5px dashed rgba(0,0,0,0.2)', borderRadius: 4 }}>
+                      {/* Spinning ring */}
+                      <div style={{
+                        width: 28, height: 28,
+                        border: '2.5px solid #e5e7eb',
+                        borderTopColor: '#1B4332',
+                        borderRadius: '50%',
+                        animation: 'spin 0.7s linear infinite',
+                      }} />
+                      <span className="label-tag" style={{ color: '#1B4332', fontSize: '0.55rem' }}>Uploading…</span>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => fileRef.current?.click()}
+                      className="w-24 h-24 flex flex-col items-center justify-center gap-1 text-gray-400 hover:text-[#1B4332] transition-colors"
+                      style={{ border: '0.5px dashed rgba(0,0,0,0.2)' }}
+                    >
+                      <Upload size={18} />
+                      <span className="label-tag">Upload</span>
+                    </button>
+                  )}
                   <input
                     ref={fileRef}
                     type="file"
