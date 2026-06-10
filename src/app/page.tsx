@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import ProductCard from '@/components/ProductCard';
+import PromoVideo from '@/components/PromoVideo';
 import { PageLoader } from '@/components/SpiceLoader';
 import { Product, Category } from '@/lib/types';
 
@@ -165,6 +166,11 @@ export default function HomePage() {
   const [activeCategory, setActiveCategory] = useState<Category>('all');
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [videoData, setVideoData] = useState({
+    url: 'https://videos.pexels.com/video-files/5908998/5908998-hd_1920_1080_25fps.mp4',
+    title: 'From farm to your kitchen',
+    subtitle: 'Watch how we source, clean and pack our spices & nuts with care',
+  });
 
   const productsRef = useReveal(0.05);
 
@@ -176,6 +182,20 @@ export default function HomePage() {
           .from('products').select('*').eq('active', true)
           .order('created_at', { ascending: false });
         if (data) setProducts(data);
+
+        // Load video settings
+        const { data: content } = await supabase
+          .from('site_content')
+          .select('key, value')
+          .in('key', ['promo_video_url', 'promo_video_title', 'promo_video_subtitle']);
+        if (content && content.length > 0) {
+          const map = Object.fromEntries(content.map((r: { key: string; value: string }) => [r.key, r.value]));
+          setVideoData({
+            url: map.promo_video_url || videoData.url,
+            title: map.promo_video_title || videoData.title,
+            subtitle: map.promo_video_subtitle || videoData.subtitle,
+          });
+        }
       } catch (e) { console.error(e); }
       finally { setLoading(false); }
     }
@@ -282,6 +302,9 @@ export default function HomePage() {
 
       {/* ── STORY ── */}
       <StorySection />
+
+      {/* ── PROMO VIDEO ── */}
+      <PromoVideo url={videoData.url} title={videoData.title} subtitle={videoData.subtitle} />
 
       {/* ── GIFT ── */}
       <GiftSection />

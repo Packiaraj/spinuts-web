@@ -4,6 +4,9 @@ import AdminNav from '@/components/AdminNav';
 import { Save, Check } from 'lucide-react';
 
 interface SiteContent {
+  promo_video_url: string;
+  promo_video_title: string;
+  promo_video_subtitle: string;
   hero_headline: string;
   hero_subtext: string;
   hero_cta: string;
@@ -29,6 +32,9 @@ interface SiteContent {
 }
 
 const DEFAULTS: SiteContent = {
+  promo_video_url: 'https://www.pexels.com/video/5908998/download/',
+  promo_video_title: 'From farm to your kitchen',
+  promo_video_subtitle: 'Watch how we source, clean and pack our spices & nuts with care',
   hero_headline: 'Pure spices.\nReal origin.\nNo middlemen.',
   hero_subtext: 'Whole spices and nuts sourced directly from the forests and farms of the Western Ghats. Unprocessed, unadulterated, and delivered to your door.',
   hero_cta: 'Shop All Products',
@@ -181,6 +187,28 @@ export default function AdminContentPage() {
               {field('gift_title', 'Title')}
               {field('gift_subtitle', 'Subtitle')}
             </div>
+          </section>
+
+          {/* Promo Video */}
+          <section className="bg-white p-6" style={{ border: '0.5px solid rgba(0,0,0,0.08)' }}>
+            <p className="label-tag mb-1" style={{ color: '#1B4332' }}>Promo Video / GIF Section</p>
+            <p className="text-xs text-gray-400 mb-5">Paste a direct video URL (.mp4) or a YouTube/Vimeo embed URL. This appears on the homepage.</p>
+            <div className="space-y-4">
+              {field('promo_video_url', 'Video URL (direct .mp4 or YouTube embed URL)')}
+              {field('promo_video_title', 'Section Title')}
+              {field('promo_video_subtitle', 'Section Subtitle')}
+            </div>
+            {content.promo_video_url && (
+              <div className="mt-4">
+                <p className="label-tag text-gray-400 mb-2">Preview</p>
+                <video
+                  src={content.promo_video_url}
+                  autoPlay muted loop playsInline
+                  className="w-full rounded"
+                  style={{ maxHeight: 200, objectFit: 'cover', border: '0.5px solid rgba(0,0,0,0.1)' }}
+                />
+              </div>
+            )}
           </section>
 
           {/* Shipping */}
