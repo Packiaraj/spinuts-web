@@ -55,6 +55,7 @@ export default function AdminProductsPage() {
 
   async function uploadImage(file: File) {
     setUploading(true);
+    const start = Date.now();
     try {
       const { supabase } = await import('@/lib/supabase');
 
@@ -72,6 +73,9 @@ export default function AdminProductsPage() {
       const { data } = supabase.storage.from('products').getPublicUrl(path);
       setEditing((f) => ({ ...f, images: [...(f.images || []), data.publicUrl] }));
     } catch (e) {
+      // keep spinner visible minimum 600ms so user sees it even on fast failure
+      const elapsed = Date.now() - start;
+      if (elapsed < 600) await new Promise((r) => setTimeout(r, 600 - elapsed));
       alert('Image upload failed: ' + (e instanceof Error ? e.message : 'unknown error'));
     }
     setUploading(false);
@@ -180,8 +184,24 @@ export default function AdminProductsPage() {
         {showForm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center"
             style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}>
-            <div className="bg-white w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8"
+            <div className="bg-white w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8 relative"
               style={{ border: '0.5px solid rgba(0,0,0,0.1)' }}>
+
+              {/* Full-form upload overlay */}
+              {uploading && (
+                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4"
+                  style={{ backgroundColor: 'rgba(255,255,255,0.88)', backdropFilter: 'blur(3px)' }}>
+                  <div style={{
+                    width: 48, height: 48,
+                    border: '4px solid #e5e7eb',
+                    borderTopColor: '#1B4332',
+                    borderRadius: '50%',
+                    animation: 'spin 0.8s linear infinite',
+                  }} />
+                  <p className="label-tag" style={{ color: '#1B4332', letterSpacing: '0.12em' }}>Uploading image…</p>
+                </div>
+              )}
+
               <div className="flex items-center justify-between mb-6">
                 <h2 className="font-medium" style={{ fontWeight: 500 }}>{isNew ? 'Add Product' : 'Edit Product'}</h2>
                 <button onClick={() => setShowForm(false)}><X size={18} className="text-gray-400" /></button>
